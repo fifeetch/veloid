@@ -7,7 +7,66 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="VéloID">
 <meta name="theme-color" content="#0d0d0d">
+<meta name="description" content="Application atelier vélo — diagnostic, standards, rayonnage, braquet · v4.1">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d0d0d'/><text y='72' x='50' text-anchor='middle' font-size='60' font-family='sans-serif' font-weight='bold' fill='%23e8400c'>V</text></svg>">
 <title>VéloID</title>
+<script>
+// Init anticipé — exécuté avant le DOM pour éviter le flash de thème
+var APP_LANG = localStorage.getItem('veloid_lang') || 'fr';
+var APP_THEME = localStorage.getItem('veloid_theme') || 'dark';
+// Fonctions stub disponibles dès le premier script principal
+function applyTheme(){
+  var isLight = APP_THEME==='light';
+  document.body && document.body.classList.toggle('light-mode', isLight);
+  var t = document.getElementById('themeToggle');
+  if(t) t.classList.toggle('on', isLight);
+}
+function setLang(lang){
+  APP_LANG = lang;
+  try{localStorage.setItem('veloid_lang',lang);}catch(e){}
+  ['FR','EN'].forEach(function(l){
+    var isActive=(l===lang.toUpperCase());
+    ['lang'+l,'settingsLang'+l].forEach(function(id){
+      var b=document.getElementById(id);
+      if(b) b.classList.toggle('active',isActive);
+    });
+  });
+  var homeTag=document.getElementById('homeTag');
+  if(homeTag) homeTag.textContent=lang==='en'?'Identify your workshop standards':'Identifiez vos standards en atelier';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key=el.dataset.i18n;
+    if(!key) return;
+    var map={
+      'Couples de Serrage':'Torque Reference',
+      'Shimano · SRAM · Campagnolo · Hope · Fox · RockShox':'Shimano · SRAM · Campagnolo · Hope · Fox · RockShox',
+      'Freins · transmission · cadre · suspensions':'Brakes · drivetrain · frame · suspension',
+      'Compatibilité Chaîne/Cassette':'Chain/Cassette Compat.',
+      'Références · alertes croisées · largeurs':'References · cross-alerts · widths',
+      'Shimano · SRAM · Campagnolo · KMC':'Shimano · SRAM · Campagnolo · KMC',
+      'Diagnostic Vélo':'Bike Diagnostic',
+      'Méthode en M · 13 points · rapport complet':'M-method · 13 points · full report',
+      'Score général · export rapport':'Overall score · export report',
+      'Référence':'Reference',
+      'Glossaire Technique':'Technical Glossary',
+      '50+ termes · FR/EN · standards expliqués':'50+ terms · FR/EN · standards explained',
+      'Lexique atelier · utile pour les apprentis':'Workshop lexicon · useful for trainees',
+    };
+    if(lang==='en' && map[key]) el.textContent=map[key];
+    else el.textContent=key;
+  });
+}
+function toggleTheme(){
+  APP_THEME=APP_THEME==='dark'?'light':'dark';
+  try{localStorage.setItem('veloid_theme',APP_THEME);}catch(e){}
+  applyTheme();
+}
+// Appliquer le thème immédiatement (body pas encore dispo, sera réappliqué sur DOMContentLoaded)
+document.addEventListener('DOMContentLoaded', function(){
+  applyTheme();
+  setLang(APP_LANG);
+});
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -467,6 +526,20 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
 .dv-btn-export{flex:1;height:48px;background:var(--green);border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer;-webkit-user-select:none}
 .dv-btn-export:active{background:#16a34a}
 
+/* ── FICHE CLIENT/VÉLO ── */
+.dv-fiche-card{background:var(--card);border:1px solid rgba(45,127,249,.3);border-radius:14px;padding:14px;margin-bottom:12px}
+.dv-fiche-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--blue);display:flex;align-items:center;gap:7px;margin-bottom:12px}
+.dv-fiche-toggle{margin-left:auto;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:0;transition:transform .2s}
+.dv-fiche-toggle.closed{transform:rotate(-90deg)}
+.dv-fiche-section{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--blue);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid rgba(45,127,249,.2)}
+.dv-fiche-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.dv-fiche-field{display:flex;flex-direction:column;gap:3px}
+.dv-fiche-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}
+.dv-fiche-inp{background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.dv-fiche-inp:focus{border-color:var(--blue)}
+.dv-fiche-inp::placeholder{color:var(--muted);font-size:13px}
+.dv-fiche-select{background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;-webkit-appearance:none}
+
 /* ── COUPLES DE SERRAGE ── */
 .cpl-section{margin-bottom:16px}
 .cpl-section-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
@@ -483,8 +556,308 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
 .cpl-nm{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:600;color:var(--text)}
 .cpl-note{font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
 
+
+/* ══ HISTORIQUE ══ */
+#historique{background:var(--bg)}
+.hist-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
+.hist-empty{text-align:center;padding:40px 20px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;line-height:2}
+.hist-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;-webkit-user-select:none;position:relative}
+.hist-card:active{background:var(--card2)}
+.hist-card-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.hist-score-badge{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.hist-card-info{flex:1;min-width:0}
+.hist-client{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-velo{font-size:12px;color:var(--text2);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hist-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px}
+.hist-card-bottom{display:flex;gap:6px;flex-wrap:wrap}
+.hist-tag{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:600}
+.hist-del-btn{position:absolute;top:12px;right:12px;width:28px;height:28px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);border-radius:7px;color:#ef4444;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.hist-actions{display:flex;gap:8px;margin-bottom:14px}
+.hist-clear-btn{flex:1;height:44px;background:var(--card);border:1px solid var(--border2);border-radius:11px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+
+/* ══ DEVIS ══ */
+#devis{background:var(--bg)}
+.devis-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
+.devis-client-bar{background:rgba(45,127,249,.08);border:1px solid rgba(45,127,249,.2);border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:10px}
+.devis-client-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);flex:1}
+.devis-line-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 13px;margin-bottom:8px}
+.devis-line-top{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px}
+.devis-line-desc{flex:1;background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:8px 10px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;border:none;width:100%}
+.devis-line-desc::placeholder{color:var(--muted)}
+.devis-line-bottom{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:6px;align-items:center}
+.devis-input{background:var(--card2);border:1px solid var(--border2);border-radius:7px;padding:7px 9px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;width:100%;text-align:center}
+.devis-input::placeholder{color:var(--muted);font-size:11px}
+.devis-line-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;text-align:center}
+.devis-del{width:30px;height:30px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:7px;color:#ef4444;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.devis-add-btn{width:100%;height:44px;background:var(--card);border:2px dashed var(--border2);border-radius:12px;color:var(--muted);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px;transition:all .15s}
+.devis-add-btn:active{background:var(--card2)}
+.devis-total-card{background:linear-gradient(135deg,#0c1624,#0d0d0d);border:2px solid var(--blue);border-radius:14px;padding:16px;margin-bottom:14px}
+.devis-total-rows{margin-bottom:12px}
+.devis-total-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border)}
+.devis-total-row:last-child{border-bottom:none}
+.devis-total-lbl{font-size:13px;color:var(--text2)}
+.devis-total-val{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text)}
+.devis-grand-total{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:2px solid var(--blue)}
+.devis-grand-lbl{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text)}
+.devis-grand-val{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--blue)}
+.devis-tva-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.devis-tva-lbl{font-size:13px;color:var(--text2)}
+.devis-tva-select{background:var(--card2);border:1px solid var(--border2);border-radius:7px;padding:6px 10px;color:var(--text);font-size:13px;outline:none}
+.devis-btns{display:flex;gap:8px}
+.devis-copy-btn{flex:1;height:46px;background:var(--blue);border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer}
+.devis-reset-btn{height:46px;padding:0 16px;background:var(--card2);border:1px solid var(--border2);border-radius:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer}
+
+/* ══ BIBLIOTHÈQUE ══ */
+#biblio{background:var(--bg)}
+.biblio-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
+.biblio-search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:11px 14px;margin-bottom:14px}
+.biblio-search input{flex:1;background:none;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text)}
+.biblio-search input::placeholder{color:var(--muted)}
+.biblio-add-btn-main{width:100%;height:48px;background:var(--green);border:none;border-radius:13px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#fff;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.biblio-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
+.biblio-card:active{background:var(--card2)}
+.biblio-card-top{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.biblio-avatar{width:42px;height:42px;border-radius:10px;background:rgba(45,127,249,.15);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--blue);flex-shrink:0}
+.biblio-card-info{flex:1;min-width:0}
+.biblio-client-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.biblio-client-contact{font-size:12px;color:var(--text2);margin-top:2px}
+.biblio-velos{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.biblio-velo-tag{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2)}
+.biblio-card-actions{display:flex;gap:6px;margin-top:10px}
+.biblio-use-btn{flex:1;height:36px;background:var(--blue);border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.biblio-diag-btn{flex:1;height:36px;background:var(--green);border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.biblio-del-btn{height:36px;width:36px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#ef4444;font-size:14px;cursor:pointer}
+.biblio-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;line-height:2}
+
+/* Modal bibliothèque */
+.biblio-modal{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.88);display:flex;align-items:flex-end}
+.biblio-modal-sheet{background:var(--card);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding:0 0 calc(var(--sb)+16px);-webkit-overflow-scrolling:touch}
+.biblio-modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto}
+.biblio-modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;padding:4px 18px 14px;color:var(--text)}
+.biblio-modal-body{padding:0 16px}
+.biblio-modal-field{margin-bottom:12px}
+.biblio-modal-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.biblio-modal-inp{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none}
+.biblio-modal-inp::placeholder{color:var(--muted)}
+.biblio-modal-save{width:calc(100% - 32px);height:50px;background:var(--green);border:none;border-radius:13px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;cursor:pointer;margin:14px 16px 0;display:block}
+
+/* Notification toast */
+.velo-toast{position:fixed;bottom:calc(var(--sb)+20px);left:50%;transform:translateX(-50%) translateY(20px);background:#22c55e;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:10px 22px;border-radius:20px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.velo-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+
+/* ══ PWA ══ */
+#splash{background:#0d0d0d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+
+/* ══ HISTORIQUE ══ */
+#historique{background:var(--bg)}
+.hist-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
+.hist-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px;line-height:2.2}
+.hist-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:9px;position:relative}
+.hist-card-hdr{display:flex;align-items:center;gap:11px;margin-bottom:8px}
+.hist-score-dot{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:#fff;flex-shrink:0}
+.hist-info{flex:1;min-width:0}
+.hist-client{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-velo{font-size:12px;color:var(--text2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist-date{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px}
+.hist-tags{display:flex;gap:5px;flex-wrap:wrap}
+.hist-tag{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;font-weight:600}
+.hist-card-btns{display:flex;gap:7px;margin-top:9px}
+.hist-open-btn{flex:1;height:36px;background:var(--blue);border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.hist-devis-btn{flex:1;height:36px;background:var(--green);border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.hist-del-btn{width:36px;height:36px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#ef4444;font-size:15px;cursor:pointer}
+.hist-top-bar{display:flex;gap:8px;margin-bottom:12px}
+.hist-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);flex:1;display:flex;align-items:center}
+.hist-clear-btn{height:36px;padding:0 14px;background:var(--card);border:1px solid var(--border2);border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);cursor:pointer}
+
+/* ══ DEVIS ══ */
+#devis{background:var(--bg)}
+.devis-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
+.devis-client-bar{background:rgba(45,127,249,.07);border:1px solid rgba(45,127,249,.18);border-radius:12px;padding:11px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.devis-client-txt{flex:1;font-size:13px;color:var(--text2)}
+.devis-client-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.devis-from-diag-btn{height:32px;padding:0 12px;background:var(--blue);border:none;border-radius:8px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;font-family:'JetBrains Mono',monospace;white-space:nowrap}
+.devis-section-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.devis-section-lbl::after{content:'';flex:1;height:1px;background:var(--border2)}
+.devis-lines{margin-bottom:4px}
+.devis-line{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:11px 12px;margin-bottom:7px}
+.devis-line-desc-inp{width:100%;background:none;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);margin-bottom:8px;padding:0}
+.devis-line-desc-inp::placeholder{color:var(--muted)}
+.devis-line-row{display:grid;grid-template-columns:1fr 1fr 80px auto;gap:6px;align-items:end}
+.devis-num-wrap{display:flex;flex-direction:column;gap:3px}
+.devis-num-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.devis-num-inp{background:var(--card2);border:1px solid var(--border2);border-radius:7px;padding:7px 8px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;width:100%;text-align:center}
+.devis-line-total{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600;color:var(--text);text-align:right;padding:7px 0;align-self:end}
+.devis-del{width:32px;height:32px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:7px;color:#ef4444;font-size:15px;cursor:pointer;align-self:end}
+.devis-add-btn{width:100%;height:44px;background:var(--card);border:2px dashed var(--border2);border-radius:11px;color:var(--muted);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:14px}
+.devis-total-card{background:#0c1624;border:2px solid var(--blue);border-radius:14px;padding:15px;margin-bottom:14px}
+.devis-total-line{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #1a2a3a;font-size:13px;color:var(--text2)}
+.devis-total-line:last-child{border-bottom:none}
+.devis-total-line span:last-child{font-family:'JetBrains Mono',monospace;color:var(--text)}
+.devis-grand{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:12px;border-top:2px solid var(--blue)}
+.devis-grand-lbl{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text)}
+.devis-grand-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--blue)}
+.devis-tva-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.devis-tva-lbl{font-size:13px;color:var(--text2)}
+.devis-tva-sel{background:var(--card2);border:1px solid var(--border2);border-radius:7px;padding:6px 10px;color:var(--text);font-size:13px;outline:none}
+.devis-btns{display:flex;gap:8px}
+.devis-share-btn{flex:1;height:46px;background:var(--green);border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer}
+.devis-copy-btn{flex:1;height:46px;background:var(--blue);border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:#fff;cursor:pointer}
+.devis-reset-btn{height:46px;padding:0 14px;background:var(--card2);border:1px solid var(--border2);border-radius:11px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer}
+
+/* ══ BIBLIOTHÈQUE ══ */
+#biblio{background:var(--bg)}
+.biblio-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 30px}
+.biblio-searchbar{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;margin-bottom:12px}
+.biblio-searchbar input{flex:1;background:none;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text)}
+.biblio-searchbar input::placeholder{color:var(--muted)}
+.biblio-new-btn{width:100%;height:48px;background:var(--blue);border:none;border-radius:13px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#fff;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px}
+.biblio-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:13px 14px;margin-bottom:9px}
+.biblio-card-top{display:flex;align-items:flex-start;gap:11px;margin-bottom:8px}
+.biblio-avatar{width:42px;height:42px;border-radius:10px;background:rgba(45,127,249,.12);display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--blue);flex-shrink:0}
+.biblio-info{flex:1;min-width:0}
+.biblio-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.biblio-contact{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5}
+.biblio-velos{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.biblio-velo-tag{background:var(--card2);border:1px solid var(--border2);border-radius:6px;padding:3px 8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2)}
+.biblio-btns{display:flex;gap:6px}
+.biblio-use-btn{flex:1;height:36px;background:var(--blue);border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.biblio-diag-btn{flex:1;height:36px;background:var(--green);border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#fff;cursor:pointer}
+.biblio-del-btn{width:36px;height:36px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.2);border-radius:8px;color:#ef4444;font-size:14px;cursor:pointer}
+.biblio-empty{text-align:center;padding:50px 20px;color:var(--muted);font-size:13px;line-height:2.2}
+
+/* Modale biblio */
+.velo-modal-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.88);display:flex;align-items:flex-end}
+.velo-modal-sheet{background:var(--surface);border-radius:20px 20px 0 0;width:100%;max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(var(--sb)+16px)}
+.velo-modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 4px}
+.velo-modal-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;padding:8px 18px 14px;color:var(--text);border-bottom:1px solid var(--border2)}
+.velo-modal-body{padding:14px 16px}
+.velo-modal-field{margin-bottom:12px}
+.velo-modal-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px}
+.velo-modal-inp{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none;-webkit-appearance:none}
+.velo-modal-inp::placeholder{color:var(--muted)}
+.velo-modal-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.velo-modal-save{width:calc(100% - 32px);height:50px;background:var(--green);border:none;border-radius:13px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;cursor:pointer;margin:14px 16px 0;display:block}
+.velo-modal-cancel{width:calc(100% - 32px);height:44px;background:var(--card2);border:1px solid var(--border2);border-radius:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;margin:8px 16px 0;display:block}
+
+/* Toast notification */
+.velo-toast{position:fixed;bottom:calc(var(--sb)+24px);left:50%;transform:translateX(-50%) translateY(16px);background:#22c55e;color:#fff;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;padding:11px 22px;border-radius:20px;z-index:9999;opacity:0;transition:all .28s;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(34,197,94,.4)}
+.velo-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.velo-toast.error{background:#ef4444;box-shadow:0 4px 20px rgba(239,68,68,.4)}
 /* scrollbar */
 ::-webkit-scrollbar{width:0;height:0}
+
+/* ══ LIGHT MODE ══ */
+body.light-mode{
+  --bg:#f5f5f0;--surface:#ffffff;--card:#ffffff;--card2:#f0ede8;
+  --border:#e0dcd6;--border2:#d0ccc6;
+  --text:#1a1a1a;--text2:#5a5550;--muted:#9a9590;
+  background:#f5f5f0;color:#1a1a1a;
+}
+body.light-mode .res-hero{background:linear-gradient(135deg,#fff1ec,#f5f5f0)}
+body.light-mode .sh-result{background:linear-gradient(135deg,#e8f0ff,#f5f5f0)}
+body.light-mode .devis-total-card{background:#eaf3ff}
+body.light-mode .splash-logo,.light-mode .home-logo{color:#1a1a1a}
+body.light-mode .ray-calc-btn:active{background:#1a5fd4}
+
+/* ══ LANG TOGGLE ══ */
+.lang-toggle{display:flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--border2);border-radius:20px;padding:3px 5px}
+.lang-btn{height:26px;padding:0 10px;border:none;border-radius:16px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;background:transparent;color:var(--muted)}
+.lang-btn.active{background:var(--red);color:#fff}
+
+/* ══ THEME TOGGLE ══ */
+.theme-toggle{width:42px;height:24px;background:var(--border2);border-radius:12px;position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0}
+.theme-toggle.on{background:var(--gold)}
+.theme-toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.theme-toggle.on::after{transform:translateX(18px)}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border)}
+.settings-lbl{font-size:14px;color:var(--text2)}
+.settings-lbl strong{color:var(--text);display:block;font-size:15px;margin-bottom:2px}
+
+/* ══ TENSION RAYONS ══ */
+.ray-tension-card{background:var(--card);border:2px solid var(--purple);border-radius:14px;padding:16px;margin-top:12px;display:none}
+.ray-tension-card.show{display:block}
+.ray-tension-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--purple);margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em}
+.tension-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.tension-side{background:var(--card2);border-radius:10px;padding:12px}
+.tension-side-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.tension-nm{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;color:var(--text);line-height:1}
+.tension-nm-unit{font-size:11px;color:var(--muted)}
+.tension-plage{font-size:11px;color:var(--text2);margin-top:3px}
+.tension-gauge-wrap{margin-bottom:6px}
+.tension-gauge-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between}
+.tension-gauge-bar{height:8px;background:var(--border2);border-radius:4px;position:relative;overflow:hidden}
+.tension-gauge-fill{height:100%;border-radius:4px;transition:width .4s}
+.tension-ratio-card{background:var(--surface);border-radius:8px;padding:9px 10px}
+.tension-ratio-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:3px}
+.tension-ratio-val{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text)}
+
+/* ══ COMPATIBILITÉ CHAÎNE/CASSETTE ══ */
+#compat{background:var(--bg)}
+.compat-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(var(--sb)+20px)}
+.compat-section{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.compat-section-hdr{background:var(--card2);border-bottom:1px solid var(--border);padding:11px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;-webkit-user-select:none}
+.compat-section-hdr-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;flex:1}
+.compat-section-body{padding:12px 14px}
+.compat-field-lbl{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:7px}
+.compat-chip-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.compat-chip{padding:7px 12px;border:2px solid var(--border2);border-radius:20px;font-size:13px;cursor:pointer;-webkit-user-select:none;transition:all .15s;color:var(--text2)}
+.compat-chip.sel{border-color:var(--red);background:var(--red-dim);color:var(--text)}
+.compat-chip:active{transform:scale(.96)}
+.compat-result{background:var(--card);border:2px solid var(--green);border-radius:14px;padding:15px;margin-top:4px;display:none}
+.compat-result.show{display:block}
+.compat-result-title{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.compat-chain-list{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.compat-chain-item{display:flex;align-items:center;gap:10px;background:var(--card2);border-radius:10px;padding:10px 12px;font-size:13px}
+.cc-badge{font-family:'JetBrains Mono',monospace;font-size:10px;padding:2px 8px;border-radius:10px;flex-shrink:0;font-weight:600}
+.cc-badge.shimano{background:rgba(45,127,249,.15);color:#2d7ff9}
+.cc-badge.sram{background:rgba(232,64,12,.12);color:#e8400c}
+.cc-badge.kmc{background:rgba(168,85,247,.12);color:#a855f7}
+.cc-badge.campa{background:rgba(245,158,11,.12);color:#d4920a}
+.compat-alert-list{display:flex;flex-direction:column;gap:6px}
+.compat-alert{display:flex;align-items:flex-start;gap:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:9px 11px;font-size:12px;color:#f87171;line-height:1.5}
+.compat-ok{display:flex;align-items:flex-start;gap:8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:8px;padding:9px 11px;font-size:12px;color:#22c55e;line-height:1.5}
+.compat-calc-btn{width:100%;height:50px;background:var(--green);border:none;border-radius:13px;font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#fff;cursor:pointer;margin-top:10px;-webkit-user-select:none}
+.compat-calc-btn:active{background:#16a34a}
+
+/* ══ GLOSSAIRE ══ */
+#glossaire{background:var(--bg)}
+.glos-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 calc(var(--sb)+20px)}
+.glos-search{display:flex;align-items:center;gap:10px;background:var(--card);border-bottom:1px solid var(--border2);padding:12px 16px;flex-shrink:0}
+.glos-search input{flex:1;background:none;border:none;outline:none;font-family:'Outfit',sans-serif;font-size:15px;color:var(--text)}
+.glos-search input::placeholder{color:var(--muted)}
+.glos-letter-bar{display:flex;flex-wrap:wrap;gap:4px;padding:10px 14px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.glos-letter-btn{width:28px;height:28px;border:1px solid var(--border2);border-radius:6px;background:var(--card2);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.glos-letter-btn.active{background:var(--red);border-color:var(--red);color:#fff}
+.glos-letter-btn:active{transform:scale(.92)}
+.glos-section{padding:0 14px}
+.glos-letter-hdr{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--red);padding:14px 0 6px;border-bottom:1px solid var(--border2);margin-bottom:10px}
+.glos-entry{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 14px;margin-bottom:8px}
+.glos-entry-hdr{display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-user-select:none}
+.glos-term{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--text);flex:1}
+.glos-tag{font-family:'JetBrains Mono',monospace;font-size:9px;padding:2px 7px;border-radius:8px;flex-shrink:0;font-weight:600}
+.glos-tag.fr{background:rgba(45,127,249,.12);color:#2d7ff9}
+.glos-tag.en{background:rgba(168,85,247,.12);color:#a855f7}
+.glos-tag.std{background:rgba(34,197,94,.1);color:#22c55e}
+.glos-arr{color:var(--muted);font-size:16px;transition:transform .2s}
+.glos-arr.open{transform:rotate(90deg)}
+.glos-def{display:none;margin-top:10px;font-size:13px;color:var(--text2);line-height:1.75;border-top:1px solid var(--border);padding-top:10px}
+.glos-def.open{display:block}
+.glos-def strong{color:var(--text)}
+.glos-def code{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--card2);padding:1px 5px;border-radius:4px;color:var(--blue)}
+.glos-def .see-also{margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.05em}
+.glos-def .see-also a{color:var(--blue);text-decoration:none;cursor:pointer}
+.glos-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+
+/* ══ SETTINGS ══ */
+#settings{background:var(--bg)}
+.settings-scroll{flex:1;overflow-y:auto;padding:0 0 calc(var(--sb)+20px)}
+.settings-section-title{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;padding:16px 16px 8px}
+.settings-group{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:20px}
+.settings-about{padding:20px 16px;text-align:center}
+.settings-version{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)}
+.settings-app-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+.settings-app-name em{color:var(--red);font-style:normal}
 </style>
 </head>
 <body>
@@ -497,9 +870,20 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
 
 <!-- HOME -->
 <div class="screen" id="home">
-  <div class="home-hdr">
-    <div class="home-logo">Vélo<em>ID</em></div>
-    <div class="home-tag">Identifiez vos standards en atelier</div>
+  <div class="home-hdr" style="display:flex;align-items:flex-start;justify-content:space-between">
+    <div>
+      <div class="home-logo">Vélo<em>ID</em></div>
+      <div class="home-tag" id="homeTag">Identifiez vos standards en atelier</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+      <div class="lang-toggle">
+        <button class="lang-btn active" id="langFR" onclick="setLang('fr')">FR</button>
+        <button class="lang-btn" id="langEN" onclick="setLang('en')">EN</button>
+      </div>
+      <div onclick="showScreen('settings')" style="width:34px;height:34px;background:var(--card);border:1px solid var(--border2);border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="var(--text2)" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="var(--text2)" stroke-width="2"/></svg>
+      </div>
+    </div>
   </div>
   <div class="search-wrap">
     <div class="search-box">
@@ -507,7 +891,7 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
       <input type="search" id="searchInput" placeholder="Chercher un standard…" oninput="filterCards()">
     </div>
   </div>
-  <div class="sec-lbl">Diagnostics guidés</div>
+  <div class="sec-lbl" style="flex-shrink:0">Diagnostics guidés</div>
   <div class="cards-scroll" id="cardsScroll">
 
     <div class="diag-card" data-tags="boitier pedalier bsa pf30 bb86 pressfit t47" onclick="startDiag('bb')">
@@ -609,10 +993,8 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
       </div><div class="dc-arr">›</div>
     </div>
 
-  </div>
-
-  <!-- ── Outils de calcul ── -->
-  <div class="sec-lbl-inner">Outils de calcul</div>
+    <!-- ── Outils de calcul ── -->
+    <div class="sec-lbl-inner" style="margin:10px 0 4px">Outils de calcul</div>
 
     <div class="diag-card" onclick="showScreen('shis')">
       <div class="dc-icon" style="background:rgba(232,64,12,.12)">
@@ -638,15 +1020,7 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
 
     <div class="diag-card" onclick="showScreen('braquet')">
       <div class="dc-icon" style="background:rgba(168,85,247,.12)">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <circle cx="14" cy="14" r="9" stroke="#a855f7" stroke-width="1.8"/>
-          <circle cx="14" cy="14" r="4" stroke="#a855f7" stroke-width="1.4"/>
-          <circle cx="14" cy="5" r="2" fill="#a855f7"/>
-          <circle cx="23" cy="14" r="2" fill="#a855f7"/>
-          <circle cx="14" cy="23" r="2" fill="#a855f7"/>
-          <circle cx="5" cy="14" r="2" fill="#a855f7"/>
-          <path d="M20 6 L16 11" stroke="#a855f7" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="9" stroke="#a855f7" stroke-width="1.8"/><circle cx="14" cy="14" r="4" stroke="#a855f7" stroke-width="1.4"/><circle cx="14" cy="5" r="2" fill="#a855f7"/><circle cx="23" cy="14" r="2" fill="#a855f7"/><circle cx="14" cy="23" r="2" fill="#a855f7"/><circle cx="5" cy="14" r="2" fill="#a855f7"/><path d="M20 6 L16 11" stroke="#a855f7" stroke-width="1.2" stroke-linecap="round"/></svg>
       </div>
       <div class="dc-info">
         <div class="dc-title">Braquet &amp; Développement</div>
@@ -657,165 +1031,106 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
 
     <div class="diag-card" onclick="showScreen('couples')">
       <div class="dc-icon" style="background:rgba(245,158,11,.12)">
-        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <circle cx="14" cy="14" r="10" stroke="#f59e0b" stroke-width="1.8"/>
-          <circle cx="14" cy="14" r="4" stroke="#f59e0b" stroke-width="1.4"/>
-          <path d="M14 4 L14 8 M14 20 L14 24 M4 14 L8 14 M20 14 L24 14" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/>
-          <path d="M7 7 L10 10 M18 18 L21 21 M21 7 L18 10 M10 18 L7 21" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="10" stroke="#f59e0b" stroke-width="1.8"/><circle cx="14" cy="14" r="4" stroke="#f59e0b" stroke-width="1.4"/><path d="M14 4 L14 8 M14 20 L14 24 M4 14 L8 14 M20 14 L24 14" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/><path d="M7 7 L10 10 M18 18 L21 21 M21 7 L18 10 M10 18 L7 21" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round"/></svg>
       </div>
       <div class="dc-info">
-        <div class="dc-title">Couples de Serrage</div>
-        <div class="dc-desc">Références Shimano &amp; SRAM · par zone</div>
-        <div class="dc-meta">Freins · transmission · cadre · roues</div>
+        <div class="dc-title" data-i18n="Couples de Serrage">Couples de Serrage</div>
+        <div class="dc-desc" data-i18n="Shimano · SRAM · Campagnolo · Hope · Fox · RockShox">Shimano · SRAM · Campagnolo · Hope · Fox · RockShox</div>
+        <div class="dc-meta" data-i18n="Freins · transmission · cadre · suspensions">Freins · transmission · cadre · suspensions</div>
+      </div><div class="dc-arr">›</div>
+    </div>
+
+    <div class="diag-card" onclick="showScreen('compat')">
+      <div class="dc-icon" style="background:rgba(34,197,94,.1)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="11" width="5" height="6" rx="1.5" stroke="#22c55e" stroke-width="1.5"/><rect x="11" y="11" width="5" height="6" rx="1.5" stroke="#22c55e" stroke-width="1.5"/><rect x="19" y="11" width="5" height="6" rx="1.5" stroke="#22c55e" stroke-width="1.5"/><line x1="8" y1="14" x2="11" y2="14" stroke="#22c55e" stroke-width="1.5"/><line x1="16" y1="14" x2="19" y2="14" stroke="#22c55e" stroke-width="1.5"/><path d="M6 6 L22 6 M6 22 L22 22" stroke="#22c55e" stroke-width="1.2" stroke-dasharray="3,2" stroke-linecap="round"/></svg>
+      </div>
+      <div class="dc-info">
+        <div class="dc-title" data-i18n="Compatibilité Chaîne/Cassette">Compatibilité Chaîne/Cassette</div>
+        <div class="dc-desc" data-i18n="Références · alertes croisées · largeurs">Références · alertes croisées · largeurs</div>
+        <div class="dc-meta" data-i18n="Shimano · SRAM · Campagnolo · KMC">Shimano · SRAM · Campagnolo · KMC</div>
       </div><div class="dc-arr">›</div>
     </div>
 
     <div class="diag-card" onclick="showScreen('diagvelo')">
       <div class="dc-icon" style="background:rgba(34,197,94,.1)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 20 Q8 12 14 10 Q20 8 24 14" stroke="#22c55e" stroke-width="1.8" fill="none" stroke-linecap="round"/><circle cx="6" cy="20" r="4" stroke="#22c55e" stroke-width="1.6"/><circle cx="22" cy="20" r="4" stroke="#22c55e" stroke-width="1.6"/><circle cx="14" cy="13" r="2.5" stroke="#22c55e" stroke-width="1.4"/><path d="M14 15.5 L14 20" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round"/><path d="M11 20 L17 20" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <div class="dc-info">
+        <div class="dc-title" data-i18n="Diagnostic Vélo">Diagnostic Vélo</div>
+        <div class="dc-desc" data-i18n="Méthode en M · 13 points · rapport complet">Méthode en M · 13 points · rapport complet</div>
+        <div class="dc-meta" data-i18n="Score général · export rapport">Score général · export rapport</div>
+      </div><div class="dc-arr">›</div>
+    </div>
+
+    <!-- ── Référence ── -->
+    <div class="sec-lbl-inner" style="margin:10px 0 4px" data-i18n="Référence">Référence</div>
+
+    <div class="diag-card" onclick="showScreen('glossaire')">
+      <div class="dc-icon" style="background:rgba(168,85,247,.1)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="4" width="16" height="20" rx="3" stroke="#a855f7" stroke-width="1.8"/><line x1="8" y1="10" x2="16" y2="10" stroke="#a855f7" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="14" x2="16" y2="14" stroke="#a855f7" stroke-width="1.4" stroke-linecap="round"/><line x1="8" y1="18" x2="13" y2="18" stroke="#a855f7" stroke-width="1.4" stroke-linecap="round"/><circle cx="20" cy="20" r="5" fill="#a855f7" stroke="none"/><text x="20" y="24" text-anchor="middle" font-size="8" fill="white" font-family="monospace" font-weight="bold">?</text></svg>
+      </div>
+      <div class="dc-info">
+        <div class="dc-title" data-i18n="Glossaire Technique">Glossaire Technique</div>
+        <div class="dc-desc" data-i18n="50+ termes · FR/EN · standards expliqués">50+ termes · FR/EN · standards expliqués</div>
+        <div class="dc-meta" data-i18n="Lexique atelier · utile pour les apprentis">Lexique atelier · utile pour les apprentis</div>
+      </div><div class="dc-arr">›</div>
+    </div>
+
+    <!-- ── Atelier ── -->
+    <div class="sec-lbl-inner" style="margin:10px 0 4px">Atelier</div>
+
+    <div class="diag-card" onclick="showScreen('biblio')">
+      <div class="dc-icon" style="background:rgba(45,127,249,.12)">
         <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-          <path d="M4 20 Q8 12 14 10 Q20 8 24 14" stroke="#22c55e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-          <circle cx="6" cy="20" r="4" stroke="#22c55e" stroke-width="1.6"/>
-          <circle cx="22" cy="20" r="4" stroke="#22c55e" stroke-width="1.6"/>
-          <circle cx="14" cy="13" r="2.5" stroke="#22c55e" stroke-width="1.4"/>
-          <path d="M14 15.5 L14 20" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round"/>
-          <path d="M11 20 L17 20" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round"/>
-          <circle cx="22" cy="7" r="2" fill="#22c55e"/>
-          <path d="M22 9 L22 14" stroke="#22c55e" stroke-width="1.2" stroke-linecap="round"/>
+          <rect x="4" y="6" width="20" height="16" rx="3" stroke="#2d7ff9" stroke-width="1.8"/>
+          <circle cx="11" cy="12" r="3" stroke="#2d7ff9" stroke-width="1.4"/>
+          <path d="M4 20 Q8 14 11 14 Q14 14 18 18" stroke="#2d7ff9" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+          <line x1="18" y1="10" x2="22" y2="10" stroke="#2d7ff9" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="18" y1="14" x2="22" y2="14" stroke="#2d7ff9" stroke-width="1.4" stroke-linecap="round"/>
         </svg>
       </div>
       <div class="dc-info">
-        <div class="dc-title">Diagnostic Vélo</div>
-        <div class="dc-desc">Méthode en M · 13 points · rapport complet</div>
-        <div class="dc-meta">Score général · export rapport</div>
+        <div class="dc-title">Clients &amp; Vélos</div>
+        <div class="dc-desc">Fiches clients · historique · contacts</div>
+        <div class="dc-meta">Bibliothèque · recherche rapide</div>
+      </div><div class="dc-arr">›</div>
+    </div>
+
+    <div class="diag-card" onclick="showScreen('historique')">
+      <div class="dc-icon" style="background:rgba(168,85,247,.1)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <circle cx="14" cy="14" r="10" stroke="#a855f7" stroke-width="1.8"/>
+          <polyline points="14,8 14,14 18,17" stroke="#a855f7" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="dc-info">
+        <div class="dc-title">Historique</div>
+        <div class="dc-desc">Diagnostics récents · rappeler une fiche</div>
+        <div class="dc-meta">Sauvegarde locale · rapide</div>
+      </div><div class="dc-arr">›</div>
+    </div>
+
+    <div class="diag-card" onclick="showScreen('devis')">
+      <div class="dc-icon" style="background:rgba(34,197,94,.1)">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect x="5" y="4" width="18" height="20" rx="3" stroke="#22c55e" stroke-width="1.8"/>
+          <line x1="9" y1="10" x2="19" y2="10" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="9" y1="14" x2="19" y2="14" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round"/>
+          <line x1="9" y1="18" x2="15" y2="18" stroke="#22c55e" stroke-width="1.4" stroke-linecap="round"/>
+          <circle cx="21" cy="21" r="5" fill="#22c55e"/>
+          <text x="21" y="25" text-anchor="middle" font-size="7" fill="#fff" font-weight="bold">€</text>
+        </svg>
+      </div>
+      <div class="dc-info">
+        <div class="dc-title">Devis Rapide</div>
+        <div class="dc-desc">Prestations · pièces · total TTC</div>
+        <div class="dc-meta">Copier · partager · imprimer</div>
       </div><div class="dc-arr">›</div>
     </div>
 
   </div>
 </div>
 
-<!-- DIAG -->
-<div class="screen" id="diag">
-  <div class="diag-hdr">
-    <div class="btn-back" onclick="goHome()">‹</div>
-    <div class="dh-info">
-      <div class="dh-title" id="diagTitle">—</div>
-      <div class="dh-step" id="diagStep">—</div>
-    </div>
-  </div>
-  <div class="prog-dots" id="progDots"></div>
-  <div class="step-scroll" id="stepScroll"></div>
-  <div class="step-foot">
-    <div class="btn-prev" id="btnPrev" onclick="prevStep()">‹</div>
-    <button class="btn-next" id="btnNext" onclick="nextStep()"><span id="btnLbl">Suivant</span><span>›</span></button>
-  </div>
-</div>
-
-<!-- RESULT -->
-<div class="screen" id="result">
-  <div class="res-hdr">
-    <div class="btn-back" onclick="goHome()">‹</div>
-    <div class="dh-info">
-      <div class="dh-title">Résultat</div>
-      <div class="dh-step">Standard identifié</div>
-    </div>
-  </div>
-  <div class="res-scroll" id="resScroll"></div>
-</div>
-
-<!-- RAYONNAGE -->
-<div class="screen" id="rayonnage">
-  <div class="diag-hdr">
-    <div class="btn-back" onclick="goHome()">‹</div>
-    <div class="dh-info">
-      <div class="dh-title">Calcul Rayonnage</div>
-      <div class="dh-step">Longueur des rayons</div>
-    </div>
-  </div>
-  <div class="ray-scroll" id="rayScroll">
-
-    <!-- SECTION JANTE -->
-    <div class="ray-section">
-      <div class="ray-sec-title">🔵 Jante</div>
-
-      <div class="ray-field">
-        <div class="ray-field-lbl">ERD — Diamètre efficace <button class="info-btn" onclick="showTip('erd')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_erd" placeholder="584" inputmode="decimal"><span class="ray-unit">mm</span></div>
-      </div>
-      <div class="ray-field">
-        <div class="ray-field-lbl">Nombre de trous jante <button class="info-btn" onclick="showTip('trous')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_trous" placeholder="32" inputmode="numeric"><span class="ray-unit">trous</span></div>
-      </div>
-      <div class="ray-field">
-        <div class="ray-field-lbl">Offset jante (OSB) <button class="info-btn" onclick="showTip('osb')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_osb" placeholder="0" inputmode="decimal"><span class="ray-unit">mm</span></div>
-      </div>
-    </div>
-
-    <!-- SECTION MOYEU -->
-    <div class="ray-section">
-      <div class="ray-sec-title">⚙️ Moyeu</div>
-
-      <div class="ray-field">
-        <div class="ray-field-lbl">OLD — Largeur totale moyeu <button class="info-btn" onclick="showTip('old')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_old" placeholder="100" inputmode="decimal"><span class="ray-unit">mm</span></div>
-      </div>
-      <div class="ray-field">
-        <div class="ray-field-lbl">PCD Gauche — Ø cercle trous flanc G <button class="info-btn" onclick="showTip('pcdg')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_pcdg" placeholder="46" inputmode="decimal"><span class="ray-unit">mm</span></div>
-      </div>
-      <div class="ray-field">
-        <div class="ray-field-lbl">PCD Droit — Ø cercle trous flanc D <button class="info-btn" onclick="showTip('pcdd')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_pcdd" placeholder="46" inputmode="decimal"><span class="ray-unit">mm</span></div>
-      </div>
-      <div class="ray-field">
-        <div class="ray-field-lbl">Distance flanc G → plan central <button class="info-btn" onclick="showTip('dg')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_dg" placeholder="35" inputmode="decimal"><span class="ray-unit">mm</span></div>
-      </div>
-      <div class="ray-field">
-        <div class="ray-field-lbl">Distance flanc D → plan central <button class="info-btn" onclick="showTip('dd')">i</button></div>
-        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_dd" placeholder="17" inputmode="decimal"><span class="ray-unit">mm</span></div>
-      </div>
-    </div>
-
-    <!-- SECTION CONFIGURATION -->
-    <div class="ray-section">
-      <div class="ray-sec-title">🔧 Configuration</div>
-
-      <div class="ray-field">
-        <div class="ray-field-lbl">Croisements <button class="info-btn" onclick="showTip('crois')">i</button></div>
-        <select class="ray-select" id="r_cross">
-          <option value="0">Radial (0 croisement)</option>
-          <option value="1">1 croisement</option>
-          <option value="2">2 croisements</option>
-          <option value="3" selected>3 croisements</option>
-          <option value="4">4 croisements</option>
-        </select>
-      </div>
-      <div class="ray-field">
-        <div class="ray-field-lbl">Trou de départ rayon <button class="info-btn" onclick="showTip('trou')">i</button></div>
-        <select class="ray-select" id="r_hole">
-          <option value="1" selected>Premier trou (standard)</option>
-          <option value="2">Deuxième trou</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="ray-result" id="rayResult">
-      <div class="ray-result-title">📐 Longueurs calculées</div>
-      <div class="ray-lengths" id="rayLengths"></div>
-      <div class="ray-detail-grid" id="rayDetails"></div>
-      <div class="tip-bar" style="margin-top:10px">
-        ⚠️ Arrondissez au <strong>demi-millimètre inférieur</strong>. Commandez ±1mm pour avoir du choix.
-      </div>
-    </div>
-
-  </div>
-  <button class="ray-calc-btn" onclick="calcRayonnage()">
-    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-    Calculer les longueurs
-  </button>
-</div>
 <!-- ══ SHIS CALCULATEUR ══ -->
 <div class="screen" id="shis">
   <div class="diag-hdr">
@@ -1141,6 +1456,111 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
 
   </div>
 </div>
+<div class="screen" id="rayonnage">
+  <div class="diag-hdr">
+    <div class="btn-back" onclick="goHome()">‹</div>
+    <div class="dh-info">
+      <div class="dh-title">Calcul Rayonnage</div>
+      <div class="dh-step">Longueur des rayons</div>
+    </div>
+  </div>
+  <div class="ray-scroll" id="rayScroll">
+
+    <!-- SECTION JANTE -->
+    <div class="ray-section">
+      <div class="ray-sec-title">🔵 Jante</div>
+
+      <div class="ray-field">
+        <div class="ray-field-lbl">ERD — Diamètre efficace <button class="info-btn" onclick="showTip('erd')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_erd" placeholder="584" inputmode="decimal"><span class="ray-unit">mm</span></div>
+      </div>
+      <div class="ray-field">
+        <div class="ray-field-lbl">Nombre de trous jante <button class="info-btn" onclick="showTip('trous')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_trous" placeholder="32" inputmode="numeric"><span class="ray-unit">trous</span></div>
+      </div>
+      <div class="ray-field">
+        <div class="ray-field-lbl">Offset jante (OSB) <button class="info-btn" onclick="showTip('osb')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_osb" placeholder="0" inputmode="decimal"><span class="ray-unit">mm</span></div>
+      </div>
+    </div>
+
+    <!-- SECTION MOYEU -->
+    <div class="ray-section">
+      <div class="ray-sec-title">⚙️ Moyeu</div>
+
+      <div class="ray-field">
+        <div class="ray-field-lbl">OLD — Largeur totale moyeu <button class="info-btn" onclick="showTip('old')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_old" placeholder="100" inputmode="decimal"><span class="ray-unit">mm</span></div>
+      </div>
+      <div class="ray-field">
+        <div class="ray-field-lbl">PCD Gauche — Ø cercle trous flanc G <button class="info-btn" onclick="showTip('pcdg')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_pcdg" placeholder="46" inputmode="decimal"><span class="ray-unit">mm</span></div>
+      </div>
+      <div class="ray-field">
+        <div class="ray-field-lbl">PCD Droit — Ø cercle trous flanc D <button class="info-btn" onclick="showTip('pcdd')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_pcdd" placeholder="46" inputmode="decimal"><span class="ray-unit">mm</span></div>
+      </div>
+      <div class="ray-field">
+        <div class="ray-field-lbl">Distance flanc G → plan central <button class="info-btn" onclick="showTip('dg')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_dg" placeholder="35" inputmode="decimal"><span class="ray-unit">mm</span></div>
+      </div>
+      <div class="ray-field">
+        <div class="ray-field-lbl">Distance flanc D → plan central <button class="info-btn" onclick="showTip('dd')">i</button></div>
+        <div class="ray-inp-row"><input class="ray-inp" type="number" id="r_dd" placeholder="17" inputmode="decimal"><span class="ray-unit">mm</span></div>
+      </div>
+    </div>
+
+    <!-- SECTION CONFIGURATION -->
+    <div class="ray-section">
+      <div class="ray-sec-title">🔧 Configuration</div>
+
+      <div class="ray-field">
+        <div class="ray-field-lbl">Croisements <button class="info-btn" onclick="showTip('crois')">i</button></div>
+        <select class="ray-select" id="r_cross">
+          <option value="0">Radial (0 croisement)</option>
+          <option value="1">1 croisement</option>
+          <option value="2">2 croisements</option>
+          <option value="3" selected>3 croisements</option>
+          <option value="4">4 croisements</option>
+        </select>
+      </div>
+      <div class="ray-field">
+        <div class="ray-field-lbl">Trou de départ rayon <button class="info-btn" onclick="showTip('trou')">i</button></div>
+        <select class="ray-select" id="r_hole">
+          <option value="1" selected>Premier trou (standard)</option>
+          <option value="2">Deuxième trou</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="ray-result" id="rayResult">
+      <div class="ray-result-title">📐 Longueurs calculées</div>
+      <div class="ray-lengths" id="rayLengths"></div>
+      <div class="ray-detail-grid" id="rayDetails"></div>
+      <div class="tip-bar" style="margin-top:10px">
+        ⚠️ Arrondissez au <strong>demi-millimètre inférieur</strong>. Commandez ±1mm pour avoir du choix.
+      </div>
+    </div>
+
+    <!-- TENSION RAYONS -->
+    <div class="ray-tension-card" id="rayTensionCard">
+      <div class="ray-tension-title">⚡ Tension estimée des rayons</div>
+      <div class="tension-grid" id="tensionGrid"></div>
+      <div id="tensionRatio"></div>
+      <div class="tip-bar" style="margin-top:10px">
+        🎯 Mesurez avec un <strong>tensiomètre</strong> (ex : Park Tool TM-1). La valeur calculée est une estimation théorique.
+      </div>
+    </div>
+
+  </div>
+  <button class="ray-calc-btn" onclick="calcRayonnage()">
+    <svg width="20" height="20" fill="none" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+    Calculer les longueurs
+  </button>
+</div>
+
+<!-- ══ SHIS CALCULATEUR ══ -->
+
 <!-- ══ BRAQUET & DÉVELOPPEMENT ══ -->
 <div class="screen" id="braquet">
   <div class="diag-hdr">
@@ -1390,6 +1810,103 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
   </div>
 
   <div class="dv-scroll" id="dvScroll">
+
+    <!-- ── FICHE CLIENT / VÉLO ── -->
+    <div class="dv-fiche-card">
+      <div class="dv-fiche-title">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="#2d7ff9" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="#2d7ff9" stroke-width="2"/></svg>
+        Fiche Client &amp; Vélo
+        <button class="dv-fiche-toggle" id="dvFicheToggle" onclick="dvToggleFiche()">▾</button>
+      </div>
+      <div id="dvFicheBody">
+        <!-- Client -->
+        <div class="dv-fiche-section">CLIENT</div>
+        <div class="dv-fiche-row">
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Nom</div>
+            <input class="dv-fiche-inp" type="text" id="dvClientNom" placeholder="Dupont" autocomplete="family-name">
+          </div>
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Prénom</div>
+            <input class="dv-fiche-inp" type="text" id="dvClientPrenom" placeholder="Jean" autocomplete="given-name">
+          </div>
+        </div>
+        <div class="dv-fiche-field" style="margin-bottom:8px">
+          <div class="dv-fiche-lbl">Téléphone</div>
+          <input class="dv-fiche-inp" type="tel" id="dvClientTel" placeholder="06 12 34 56 78" autocomplete="tel">
+        </div>
+        <div class="dv-fiche-field" style="margin-bottom:8px">
+          <div class="dv-fiche-lbl">Email</div>
+          <input class="dv-fiche-inp" type="email" id="dvClientMail" placeholder="jean.dupont@mail.com" autocomplete="email">
+        </div>
+
+        <!-- Vélo -->
+        <div class="dv-fiche-section" style="margin-top:10px">VÉLO</div>
+        <div class="dv-fiche-row">
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Marque</div>
+            <input class="dv-fiche-inp" type="text" id="dvVeloMarque" placeholder="Trek, Specialized…">
+          </div>
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Modèle</div>
+            <input class="dv-fiche-inp" type="text" id="dvVeloModele" placeholder="Domane, Tarmac…">
+          </div>
+        </div>
+        <div class="dv-fiche-row">
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Année</div>
+            <input class="dv-fiche-inp" type="number" id="dvVeloAnnee" placeholder="2023" inputmode="numeric" maxlength="4">
+          </div>
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Couleur</div>
+            <input class="dv-fiche-inp" type="text" id="dvVeloCouleur" placeholder="Noir mat…">
+          </div>
+        </div>
+        <div class="dv-fiche-field" style="margin-bottom:8px">
+          <div class="dv-fiche-lbl">N° de série</div>
+          <input class="dv-fiche-inp" type="text" id="dvVeloSerie" placeholder="Gravé sous le boîtier…" style="font-family:'JetBrains Mono',monospace;font-size:13px">
+        </div>
+        <div class="dv-fiche-row">
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Kilométrage</div>
+            <input class="dv-fiche-inp" type="number" id="dvVeloKm" placeholder="3500" inputmode="numeric">
+          </div>
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Type</div>
+            <select class="dv-fiche-select" id="dvVeloType">
+              <option value="">—</option>
+              <option>Route</option>
+              <option>Gravel</option>
+              <option>VTT XC</option>
+              <option>VTT Trail</option>
+              <option>VTT Enduro</option>
+              <option>VTT DH</option>
+              <option>E-Bike</option>
+              <option>Ville / Trekking</option>
+              <option>BMX</option>
+              <option>Autre</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Atelier -->
+        <div class="dv-fiche-section" style="margin-top:10px">ATELIER</div>
+        <div class="dv-fiche-row">
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Mécanicien</div>
+            <input class="dv-fiche-inp" type="text" id="dvMeca" placeholder="Nom du mécanicien">
+          </div>
+          <div class="dv-fiche-field">
+            <div class="dv-fiche-lbl">Date</div>
+            <input class="dv-fiche-inp" type="date" id="dvDate">
+          </div>
+        </div>
+        <div class="dv-fiche-field">
+          <div class="dv-fiche-lbl">Atelier / Boutique</div>
+          <input class="dv-fiche-inp" type="text" id="dvAtelier" placeholder="Nom de l'atelier">
+        </div>
+      </div>
+    </div>
 
     <!-- ── SCORE GLOBAL ── -->
     <div class="dv-score-card">
@@ -1646,13 +2163,12 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
   </div>
 </div>
 
-<!-- ══ COUPLES DE SERRAGE ══ -->
-<div class="screen" id="couples">
+  <div class="screen" id="couples">
   <div class="diag-hdr">
     <div class="btn-back" onclick="goHome()">‹</div>
     <div class="dh-info">
       <div class="dh-title">Couples de Serrage</div>
-      <div class="dh-step">Shimano &amp; SRAM · valeurs de référence</div>
+      <div class="dh-step">Shimano · SRAM · Campagnolo · Hope · DT Swiss · Fox · RockShox</div>
     </div>
   </div>
 
@@ -1946,6 +2462,193 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
       </div>
     </div>
 
+    <!-- ── CAMPAGNOLO ── -->
+    <div class="cpl-section">
+      <div class="cpl-section-title">🟡 Campagnolo</div>
+      <div class="cpl-grid">
+        <div class="cpl-card">
+          <div class="cpl-zone">Boîtier pédalier (Ultra Torque)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Campa</span><span class="cpl-nm">42 Nm</span></div>
+          <div class="cpl-note">Couples de la coupelle ITA</div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Manivelle gauche Ultra Torque</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Campa</span><span class="cpl-nm">42 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Cassette lockring Campagnolo</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Campa</span><span class="cpl-nm">35 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Levier de frein / dérailleur</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Campa</span><span class="cpl-nm">8–10 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Vis plateau (bras manivelle)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Campa</span><span class="cpl-nm">8–10 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Axe traversant fourche</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Campa</span><span class="cpl-nm">12–15 Nm</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HOPE ── -->
+    <div class="cpl-section">
+      <div class="cpl-section-title" style="color:#e8400c">🔴 Hope Technology</div>
+      <div class="cpl-grid">
+        <div class="cpl-card cpl-important">
+          <div class="cpl-zone">Axe traversant avant Hope (M12)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">12 Nm</span></div>
+          <div class="cpl-note">Modèles Pro 4 · Pro 5</div>
+        </div>
+        <div class="cpl-card cpl-important">
+          <div class="cpl-zone">Axe traversant arrière Hope (M12)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">12 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Lockring cassette Hope</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">40 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Corps de roue libre Hope</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">40 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Vis rotor 6 trous Hope</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">4 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Étrier frein Hope (vis M5)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">6 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Raccord hydraulique Hope</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">5 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Boîtier pédalier Hope (filetage)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(232,64,12,.12);color:#e8400c">Hope</span><span class="cpl-nm">40–50 Nm</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DT SWISS ── -->
+    <div class="cpl-section">
+      <div class="cpl-section-title" style="color:#2d7ff9">🔵 DT Swiss</div>
+      <div class="cpl-grid">
+        <div class="cpl-card">
+          <div class="cpl-zone">Axe traversant avant (M12×100)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(45,127,249,.12);color:#2d7ff9">DT Swiss</span><span class="cpl-nm">15 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Axe traversant arrière (M12×142/148)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(45,127,249,.12);color:#2d7ff9">DT Swiss</span><span class="cpl-nm">15 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Écrou de fixation roue DT</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(45,127,249,.12);color:#2d7ff9">DT Swiss</span><span class="cpl-nm">40 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Nipple rayon interne (vis)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(45,127,249,.12);color:#2d7ff9">DT Swiss</span><span class="cpl-nm">Tensiomètre</span></div>
+          <div class="cpl-note">Tension cible 80–120 kgf selon modèle</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FOX SUSPENSION ── -->
+    <div class="cpl-section">
+      <div class="cpl-section-title" style="color:#f59e0b">🟠 Fox Racing Shox</div>
+      <div class="cpl-grid">
+        <div class="cpl-card cpl-important">
+          <div class="cpl-zone">Fourche — Vis de bouchon de jambe</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Fox</span><span class="cpl-nm">5–7 Nm</span></div>
+          <div class="cpl-note">Ne pas dépasser — risque de rupture</div>
+        </div>
+        <div class="cpl-card cpl-important">
+          <div class="cpl-zone">Fourche — Vis de réglage externe</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Fox</span><span class="cpl-nm">1–1,5 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Amortisseur — Vis de fixation (M6)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Fox</span><span class="cpl-nm">8–12 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Valve Schrader chambre à air</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Fox</span><span class="cpl-nm">Main seulement</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Bouchon supérieur jambe</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Fox</span><span class="cpl-nm">15 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Axe de roue avant fourche Fox</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(245,158,11,.15);color:#d4920a">Fox</span><span class="cpl-nm">15 Nm</span></div>
+          <div class="cpl-note">Fox 34/36/38 · Torque cap</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ROCKSHOX ── -->
+    <div class="cpl-section">
+      <div class="cpl-section-title" style="color:#a855f7">🟣 RockShox (SRAM)</div>
+      <div class="cpl-grid">
+        <div class="cpl-card cpl-important">
+          <div class="cpl-zone">Fourche — Bouchon de jambe inférieur</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(168,85,247,.12);color:#a855f7">RockShox</span><span class="cpl-nm">3–5 Nm</span></div>
+          <div class="cpl-note">⚠️ Ne pas dépasser — pièce fragile</div>
+        </div>
+        <div class="cpl-card cpl-important">
+          <div class="cpl-zone">Fourche — Bouchon de jambe supérieur</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(168,85,247,.12);color:#a855f7">RockShox</span><span class="cpl-nm">15 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Amortisseur — Vis de fixation</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(168,85,247,.12);color:#a855f7">RockShox</span><span class="cpl-nm">8–12 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Vis de réglage rebond/compression</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(168,85,247,.12);color:#a855f7">RockShox</span><span class="cpl-nm">Main seulement</span></div>
+          <div class="cpl-note">Clips de réglage — sans outil</div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Axe de roue avant (Maxle Stealth)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(168,85,247,.12);color:#a855f7">RockShox</span><span class="cpl-nm">15 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Vis de purge (bleed port)</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(168,85,247,.12);color:#a855f7">RockShox</span><span class="cpl-nm">0,3–0,5 Nm</span></div>
+          <div class="cpl-note">Très faible — juste pour étanchéité</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHRIS KING ── -->
+    <div class="cpl-section">
+      <div class="cpl-section-title" style="color:#22c55e">🟢 Chris King</div>
+      <div class="cpl-grid">
+        <div class="cpl-card">
+          <div class="cpl-zone">Jeu de direction — bague de serrage</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(34,197,94,.1);color:#22c55e">CKing</span><span class="cpl-nm">Main + outil</span></div>
+          <div class="cpl-note">Serrage précis au ressenti sans couple — voir instructions CK</div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Axe traversant avant R45</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(34,197,94,.1);color:#22c55e">CKing</span><span class="cpl-nm">12–15 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Axe traversant arrière R45</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(34,197,94,.1);color:#22c55e">CKing</span><span class="cpl-nm">12–15 Nm</span></div>
+        </div>
+        <div class="cpl-card">
+          <div class="cpl-zone">Lockring cassette CK</div>
+          <div class="cpl-val-row"><span class="cpl-brand" style="background:rgba(34,197,94,.1);color:#22c55e">CKing</span><span class="cpl-nm">40 Nm</span></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── LÉGENDE ── -->
     <div style="background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-top:4px">
       <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Matériaux — ajustements couples</div>
@@ -1980,6 +2683,10 @@ body{background:#0d0d0d;color:#f0ede8;font-family:'Outfit',sans-serif}
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // Init modules on first show
+  if(id==='historique') histRender();
+  if(id==='biblio')     biblioRender();
+  if(id==='devis' && !devisLines.length) devisInit();
 }
 function showTab(id){ showScreen(id); } // alias conservé pour compatibilité
 
@@ -2519,191 +3226,202 @@ function dvUpdateSummary(){
   document.getElementById('dvSummary').style.display = 'block';
 }
 
+function dvToggleFiche(){
+  const body = document.getElementById('dvFicheBody');
+  const btn  = document.getElementById('dvFicheToggle');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  btn.classList.toggle('closed', open);
+}
+
+function dvGetFiche(){
+  return {
+    nom:     document.getElementById('dvClientNom')?.value    || '',
+    prenom:  document.getElementById('dvClientPrenom')?.value || '',
+    tel:     document.getElementById('dvClientTel')?.value    || '',
+    mail:    document.getElementById('dvClientMail')?.value   || '',
+    marque:  document.getElementById('dvVeloMarque')?.value   || '',
+    modele:  document.getElementById('dvVeloModele')?.value   || '',
+    annee:   document.getElementById('dvVeloAnnee')?.value    || '',
+    couleur: document.getElementById('dvVeloCouleur')?.value  || '',
+    serie:   document.getElementById('dvVeloSerie')?.value    || '',
+    km:      document.getElementById('dvVeloKm')?.value       || '',
+    type:    document.getElementById('dvVeloType')?.value     || '',
+    meca:    document.getElementById('dvMeca')?.value         || '',
+    date:    document.getElementById('dvDate')?.value         || new Date().toLocaleDateString('fr-FR'),
+    atelier: document.getElementById('dvAtelier')?.value      || '',
+  };
+}
+
 function dvExport(){
   const filled = DV_POINTS.filter(p => dvState[p.id].status !== null);
   if(!filled.length){ alert('Aucun point contrôlé — commencez le diagnostic.'); return; }
 
+  const f = dvGetFiche();
   const comment = document.getElementById('dvSumComment')?.value || '';
-  const date    = new Date().toLocaleDateString('fr-FR');
+  const date = f.date || new Date().toLocaleDateString('fr-FR');
 
   let penalite = 0;
   filled.forEach(p => { penalite += DV_STATUS[dvState[p.id].status].score; });
-  const score = Math.max(0, Math.round(100 - (penalite / Math.max(filled.length * 80, 1)) * 100));
-
-  let txt = `════════════════════════════════════\n`;
-  txt    += `  RAPPORT DIAGNOSTIC VÉLO — VéloID\n`;
-  txt    += `════════════════════════════════════\n`;
-  txt    += `Date : ${date}\n`;
-  txt    += `Score général : ${score}/100\n`;
-  txt    += `Points contrôlés : ${filled.length} / ${DV_POINTS.length}\n\n`;
-
-  const byStatus = { danger:[], replace:[], fix:[], warn:[], ok:[] };
-  filled.forEach(p => { byStatus[dvState[p.id].status]?.push(p); });
-
-  if(byStatus.danger.length)  txt += `⚠️  DANGER (${byStatus.danger.length})\n`;
-  if(byStatus.replace.length) txt += `🔴 À REMPLACER (${byStatus.replace.length})\n`;
-  if(byStatus.fix.length)     txt += `🟠 À RÉGLER (${byStatus.fix.length})\n`;
-  if(byStatus.warn.length)    txt += `🟡 À SURVEILLER (${byStatus.warn.length})\n`;
-  if(byStatus.ok.length)      txt += `🟢 OK (${byStatus.ok.length})\n`;
-  txt += `\n${'─'.repeat(38)}\nDÉTAIL DES POINTS\n${'─'.repeat(38)}\n\n`;
-
-  DV_POINTS.forEach(p => {
-    const s = dvState[p.id];
-    if(!s.status) return;
-    const st   = DV_STATUS[s.status];
-    const prio = s.priority === 'urg' ? ' [URGENT]' : s.priority === 'med' ? ' [Moyen]' : s.priority === 'low' ? ' [Faible]' : '';
-    txt += `${p.id < 10 ? ' ' : ''}${p.id}. ${p.name}\n`;
-    txt += `    État : ${st.label}${prio}\n`;
-    if(s.note)   txt += `    Remarque : ${s.note}\n`;
-    if(s.action) txt += `    Action   : ${s.action}\n`;
-    txt += '\n';
-  });
-
-  if(comment){
-    txt += `${'─'.repeat(38)}\nCOMMENTAIRE MÉCANICIEN\n${'─'.repeat(38)}\n${comment}\n\n`;
-  }
-  txt += `${'─'.repeat(38)}\nGénéré par VéloID · ${new Date().toLocaleString('fr-FR')}`;
-
-  // Afficher dans une modale de copie
-  dvShowExportModal(txt);
-}
-
-function dvShowExportModal(txt){
-  const old = document.getElementById('dvExportModal');
-  if(old) old.remove();
-
-  // Build SVG mini-schema with colored markers for the report
-  function buildSchemaSvg(){
-    const svgEl = document.getElementById('dvBikeSvg');
-    if(!svgEl) return '';
-    // Clone and inline current marker colors
-    const clone = svgEl.cloneNode(true);
-    clone.setAttribute('width','100%');
-    clone.setAttribute('style','display:block;max-width:500px;margin:0 auto');
-    // Remove transparent click zones (dv-zone class)
-    clone.querySelectorAll('.dv-zone').forEach(z => z.remove());
-    return clone.outerHTML;
-  }
-
-  // Build graphic HTML report
-  const filled = DV_POINTS.filter(p => dvState[p.id].status !== null);
-  let penalite = 0;
-  filled.forEach(p => { penalite += DV_STATUS[dvState[p.id].status].score; });
-  const score = filled.length ? Math.max(0, Math.round(100 - (penalite / Math.max(filled.length*80,1))*100)) : '—';
-  const scoreCol = typeof score==='number' ? (score>=80?'#22c55e':score>=60?'#f97316':'#ef4444') : '#9a9590';
-  const date = new Date().toLocaleDateString('fr-FR');
-  const comment = document.getElementById('dvSumComment')?.value || '';
-
-  // Status counts
+  const score = Math.max(0, Math.round(100-(penalite/Math.max(filled.length*80,1))*100));
+  const scoreCol = score>=80?'#22c55e':score>=60?'#f97316':'#ef4444';
   const counts = {ok:0,warn:0,fix:0,replace:0,danger:0};
   filled.forEach(p => { if(counts[dvState[p.id].status]!==undefined) counts[dvState[p.id].status]++; });
 
-  // Build points HTML
-  const byPrio = ['danger','replace','fix','warn','ok'];
-  let pointsHtml = '';
-  byPrio.forEach(st => {
-    const pts = DV_POINTS.filter(p => dvState[p.id].status === st);
+  const clientLine = [f.prenom, f.nom].filter(Boolean).join(' ');
+  const veloLine   = [f.marque, f.modele, f.annee, f.type].filter(Boolean).join(' · ');
+
+  // Texte brut
+  let txt = 'RAPPORT DIAGNOSTIC VÉLO — VéloID\n';
+  txt += '════════════════════════════════════\n';
+  txt += 'Date : ' + date + '\n';
+  if(f.atelier) txt += 'Atelier : ' + f.atelier + '\n';
+  if(f.meca)    txt += 'Mécanicien : ' + f.meca + '\n';
+  txt += '\nCLIENT\n────────────────────\n';
+  if(clientLine) txt += 'Nom : ' + clientLine + '\n';
+  if(f.tel)  txt += 'Tél : ' + f.tel + '\n';
+  if(f.mail) txt += 'Email : ' + f.mail + '\n';
+  txt += '\nVÉLO\n────────────────────\n';
+  if(veloLine) txt += veloLine + '\n';
+  if(f.couleur) txt += 'Couleur : ' + f.couleur + '\n';
+  if(f.serie)   txt += 'N° série : ' + f.serie + '\n';
+  if(f.km)      txt += 'Kilométrage : ' + parseInt(f.km).toLocaleString('fr-FR') + ' km\n';
+  txt += '\nSCORE GÉNÉRAL : ' + score + '/100\n';
+  txt += 'OK:' + counts.ok + ' / Surveiller:' + counts.warn + ' / Régler:' + counts.fix + ' / Remplacer:' + counts.replace + ' / Danger:' + counts.danger + '\n';
+  txt += '\n════════════════════════════════════\nDÉTAIL DES POINTS\n════════════════════════════════════\n\n';
+
+  ['danger','replace','fix','warn','ok'].forEach(st => {
+    const pts = DV_POINTS.filter(p => dvState[p.id].status===st);
     if(!pts.length) return;
-    const S = DV_STATUS[st];
-    pointsHtml += `<div style="margin-bottom:12px">
-      <div style="font-size:10px;font-family:monospace;color:${S.col};letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;padding-bottom:3px;border-bottom:1px solid #2a2a2a">${S.label.toUpperCase()} (${pts.length})</div>`;
+    txt += DV_STATUS[st].label.toUpperCase() + '\n';
     pts.forEach(p => {
       const s = dvState[p.id];
-      const prio = s.priority==='urg'?' 🚨 URGENT':s.priority==='med'?' ⚠️ Moyen':'';
-      pointsHtml += `<div style="background:#1a1a1a;border-left:3px solid ${S.col};border-radius:0 8px 8px 0;padding:8px 10px;margin-bottom:5px">
-        <div style="font-family:monospace;font-size:12px;color:#f0ede8;font-weight:bold">${p.id}. ${p.name}${prio}</div>
-        ${s.action?`<div style="font-size:11px;color:#9a9590;margin-top:3px">→ ${s.action}</div>`:''}
-        ${s.note?`<div style="font-size:11px;color:#5a5550;margin-top:2px">${s.note}</div>`:''}
-      </div>`;
+      const prio = s.priority==='urg'?' [URGENT]':s.priority==='med'?' [Moyen]':'';
+      txt += '  ' + p.id + '. ' + p.name + prio + '\n';
+      if(s.action) txt += '     → ' + s.action + '\n';
+      if(s.note)   txt += '     ' + s.note + '\n';
+    });
+    txt += '\n';
+  });
+
+  if(comment) txt += 'COMMENTAIRE\n────────────────────\n' + comment + '\n\n';
+  txt += '────────────────────────────────────\nGénéré par VéloID · ' + new Date().toLocaleString('fr-FR');
+
+  dvShowExportModal(txt, f, score, scoreCol, counts, comment);
+}
+
+function dvShowExportModal(txt, f, score, scoreCol, counts, comment){
+  const old = document.getElementById('dvExportModal');
+  if(old) old.remove();
+
+  const clientLine = [f.prenom, f.nom].filter(Boolean).join(' ');
+  const veloLine   = [f.marque, f.modele, f.annee].filter(Boolean).join(' ');
+  const date = f.date || new Date().toLocaleDateString('fr-FR');
+
+  // Bouton mail — Web Share API ou fallback copie
+  const mailHref = f.mail ? 'mailto:' + f.mail + '?subject=' + encodeURIComponent('Rapport diagnostic vélo' + (clientLine?' — '+clientLine:'') + (veloLine?' — '+veloLine:'')) : null;
+
+  // Schéma SVG
+  function buildSvg(){
+    const el = document.getElementById('dvBikeSvg');
+    if(!el) return '';
+    const c = el.cloneNode(true);
+    c.querySelectorAll('.dv-zone').forEach(z => z.remove());
+    c.setAttribute('style','display:block;width:100%;max-width:460px;margin:0 auto');
+    return c.outerHTML;
+  }
+
+  // Points HTML
+  let pointsHtml = '';
+  ['danger','replace','fix','warn','ok'].forEach(st => {
+    const pts = DV_POINTS.filter(p => dvState[p.id].status===st);
+    if(!pts.length) return;
+    const S = DV_STATUS[st];
+    pointsHtml += '<div style="margin-bottom:12px"><div style="font-size:10px;font-family:monospace;color:'+S.col+';letter-spacing:.1em;text-transform:uppercase;padding:5px 0;border-bottom:1px solid #1e1e1e;margin-bottom:6px">'+S.label+' ('+pts.length+')</div>';
+    pts.forEach(p => {
+      const s = dvState[p.id];
+      const prio = s.priority==='urg'?'<span style="color:#ef4444;font-size:10px;margin-left:6px">🚨 URGENT</span>':s.priority==='med'?'<span style="color:#f97316;font-size:10px;margin-left:6px">⚠️ Moyen</span>':'';
+      pointsHtml += '<div style="background:#141414;border-left:3px solid '+S.col+';border-radius:0 8px 8px 0;padding:8px 11px;margin-bottom:5px">';
+      pointsHtml += '<div style="font-size:13px;color:#f0ede8;font-weight:600">'+p.id+'. '+p.name+prio+'</div>';
+      if(s.action) pointsHtml += '<div style="font-size:12px;color:#9a9590;margin-top:3px">→ '+s.action+'</div>';
+      if(s.note)   pointsHtml += '<div style="font-size:11px;color:#5a5550;margin-top:2px">'+s.note+'</div>';
+      pointsHtml += '</div>';
     });
     pointsHtml += '</div>';
   });
 
-  const modalHtml = `
-    <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;display:flex;flex-direction:column;height:100%;overflow:hidden">
-      <!-- Header -->
-      <div style="padding:14px 16px;border-bottom:1px solid #222;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:#0d0d0d">
-        <div>
-          <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:#f0ede8">📋 Rapport Diagnostic</div>
-          <div style="font-size:11px;color:#5a5550;font-family:monospace">${date}</div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button onclick="dvCopyExport()" id="dvCopyExportBtn"
-            style="height:34px;padding:0 14px;background:#22c55e;border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer">📋 Copier</button>
-          <button onclick="document.getElementById('dvExportModal').remove()"
-            style="width:34px;height:34px;background:#242424;border:1px solid #333;border-radius:8px;color:#9a9590;font-size:16px;cursor:pointer">✕</button>
-        </div>
-      </div>
-
-      <!-- Scrollable report content -->
-      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch" id="dvReportScroll">
-        <div id="dvReportContent" style="padding:16px;font-family:'Outfit',sans-serif">
-
-          <!-- Score banner -->
-          <div style="background:linear-gradient(135deg,#0d1f14,#0d0d0d);border:1px solid ${scoreCol}44;border-radius:12px;padding:16px;margin-bottom:14px;display:flex;align-items:center;gap:16px">
-            <div style="text-align:center;flex-shrink:0">
-              <div style="font-family:'Syne',sans-serif;font-size:46px;font-weight:800;color:${scoreCol};line-height:1">${score}</div>
-              <div style="font-size:11px;color:#5a5550;font-family:monospace">/ 100</div>
-            </div>
-            <div style="flex:1">
-              <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px">
-                <div style="background:#1a1a1a;border-radius:6px;padding:6px 4px;text-align:center">
-                  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#22c55e">${counts.ok}</div>
-                  <div style="font-size:9px;color:#5a5550;font-family:monospace">OK</div>
-                </div>
-                <div style="background:#1a1a1a;border-radius:6px;padding:6px 4px;text-align:center">
-                  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#eab308">${counts.warn}</div>
-                  <div style="font-size:9px;color:#5a5550;font-family:monospace">Surv.</div>
-                </div>
-                <div style="background:#1a1a1a;border-radius:6px;padding:6px 4px;text-align:center">
-                  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#f97316">${counts.fix}</div>
-                  <div style="font-size:9px;color:#5a5550;font-family:monospace">Régler</div>
-                </div>
-                <div style="background:#1a1a1a;border-radius:6px;padding:6px 4px;text-align:center">
-                  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#ef4444">${counts.replace}</div>
-                  <div style="font-size:9px;color:#5a5550;font-family:monospace">Rempl.</div>
-                </div>
-                <div style="background:#1a1a1a;border-radius:6px;padding:6px 4px;text-align:center">
-                  <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:#a855f7">${counts.danger}</div>
-                  <div style="font-size:9px;color:#5a5550;font-family:monospace">Danger</div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Schéma vélo -->
-          <div style="background:#0d0d0d;border:1px solid #222;border-radius:12px;padding:12px;margin-bottom:14px">
-            <div style="font-size:10px;font-family:monospace;color:#5a5550;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;text-align:center">Localisation des points</div>
-            ${buildSchemaSvg()}
-          </div>
-
-          <!-- Points par état -->
-          <div style="margin-bottom:14px">
-            <div style="font-size:10px;font-family:monospace;color:#5a5550;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Détail des points</div>
-            ${pointsHtml || '<div style="color:#5a5550;font-size:13px">Aucun point renseigné</div>'}
-          </div>
-
-          <!-- Commentaire -->
-          ${comment ? `<div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:12px;margin-bottom:14px">
-            <div style="font-size:10px;font-family:monospace;color:#5a5550;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Commentaire mécanicien</div>
-            <div style="font-size:13px;color:#9a9590;line-height:1.7">${comment}</div>
-          </div>` : ''}
-
-          <!-- Footer -->
-          <div style="text-align:center;font-family:monospace;font-size:10px;color:#3a3a3a;padding-top:8px;border-top:1px solid #1a1a1a">
-            Généré par VéloID · ${new Date().toLocaleString('fr-FR')}
-          </div>
-        </div>
-      </div>
-
-      <!-- Textarea caché pour copie texte -->
-      <textarea id="dvExportTxt" style="position:absolute;left:-9999px;top:0;opacity:0" readonly>${txt.replace(/</g,'&lt;')}</textarea>
-    </div>`;
-
   const modal = document.createElement('div');
   modal.id = 'dvExportModal';
-  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);display:flex;flex-direction:column;padding:12px;';
-  modal.innerHTML = modalHtml;
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.93);display:flex;flex-direction:column;padding:10px;';
+  modal.innerHTML = `
+    <div style="background:#111;border:1px solid #2a2a2a;border-radius:16px;display:flex;flex-direction:column;height:100%;overflow:hidden">
+      <div style="padding:12px 14px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:8px;flex-shrink:0;background:#0d0d0d">
+        <div style="flex:1">
+          <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:#f0ede8">📋 Rapport Diagnostic</div>
+          <div style="font-size:11px;color:#5a5550;font-family:monospace">${date}${f.atelier?' · '+f.atelier:''}</div>
+        </div>
+        <button onclick="document.getElementById('dvExportModal').remove()"
+          style="width:32px;height:32px;background:#1e1e1e;border:1px solid #333;border-radius:8px;color:#9a9590;font-size:16px;cursor:pointer">✕</button>
+      </div>
+      <div style="padding:10px 14px;border-bottom:1px solid #1e1e1e;display:flex;gap:8px;flex-shrink:0">
+        <button onclick="dvCopyExport()" id="dvCopyExportBtn"
+          style="flex:1;height:42px;background:#2d7ff9;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer">📋 Copier</button>
+        <button onclick="dvShareReport()" id="dvShareBtn"
+          style="flex:1;height:42px;background:#22c55e;border:none;border-radius:9px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;cursor:pointer">✉️ Partager</button>
+      </div>
+      <div style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px">
+
+        <div style="background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:14px;margin-bottom:12px">
+          <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:800;color:#f0ede8;margin-bottom:10px">VéloID — Rapport Diagnostic</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="background:#141414;border-radius:8px;padding:10px">
+              <div style="font-size:9px;font-family:monospace;color:#2d7ff9;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">CLIENT</div>
+              ${clientLine?'<div style="font-size:13px;color:#f0ede8;font-weight:600">'+clientLine+'</div>':'<div style="font-size:12px;color:#5a5550">—</div>'}
+              ${f.tel?'<div style="font-size:12px;color:#9a9590;margin-top:2px">📞 '+f.tel+'</div>':''}
+              ${f.mail?'<div style="font-size:12px;color:#9a9590">✉️ '+f.mail+'</div>':''}
+            </div>
+            <div style="background:#141414;border-radius:8px;padding:10px">
+              <div style="font-size:9px;font-family:monospace;color:#2d7ff9;letter-spacing:.1em;text-transform:uppercase;margin-bottom:5px">VÉLO</div>
+              ${veloLine?'<div style="font-size:13px;color:#f0ede8;font-weight:600">'+veloLine+'</div>':'<div style="font-size:12px;color:#5a5550">—</div>'}
+              ${f.type?'<div style="font-size:12px;color:#9a9590;margin-top:2px">'+f.type+'</div>':''}
+              ${f.couleur?'<div style="font-size:12px;color:#9a9590">'+f.couleur+'</div>':''}
+              ${f.km?'<div style="font-size:12px;color:#9a9590">'+parseInt(f.km).toLocaleString('fr-FR')+' km</div>':''}
+              ${f.serie?'<div style="font-size:11px;color:#5a5550;font-family:monospace">'+f.serie+'</div>':''}
+            </div>
+          </div>
+          ${f.meca?'<div style="font-size:11px;color:#5a5550;margin-top:8px;text-align:right;font-family:monospace">Mécanicien : '+f.meca+(f.atelier?' · '+f.atelier:'')+'</div>':''}
+        </div>
+
+        <div style="background:linear-gradient(135deg,#0d1f14,#0d0d0d);border:1px solid ${scoreCol}44;border-radius:12px;padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:14px">
+          <div style="text-align:center;flex-shrink:0">
+            <div style="font-family:'Syne',sans-serif;font-size:44px;font-weight:800;color:${scoreCol};line-height:1">${score}</div>
+            <div style="font-size:10px;color:#5a5550;font-family:monospace">/100</div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:3px">
+            <div style="background:#141414;border-radius:6px;padding:5px 2px;text-align:center"><div style="font-size:16px;font-weight:800;color:#22c55e">${counts.ok}</div><div style="font-size:8px;color:#5a5550">OK</div></div>
+            <div style="background:#141414;border-radius:6px;padding:5px 2px;text-align:center"><div style="font-size:16px;font-weight:800;color:#eab308">${counts.warn}</div><div style="font-size:8px;color:#5a5550">Surv.</div></div>
+            <div style="background:#141414;border-radius:6px;padding:5px 2px;text-align:center"><div style="font-size:16px;font-weight:800;color:#f97316">${counts.fix}</div><div style="font-size:8px;color:#5a5550">Régl.</div></div>
+            <div style="background:#141414;border-radius:6px;padding:5px 2px;text-align:center"><div style="font-size:16px;font-weight:800;color:#ef4444">${counts.replace}</div><div style="font-size:8px;color:#5a5550">Rempl.</div></div>
+            <div style="background:#141414;border-radius:6px;padding:5px 2px;text-align:center"><div style="font-size:16px;font-weight:800;color:#a855f7">${counts.danger}</div><div style="font-size:8px;color:#5a5550">Dang.</div></div>
+          </div>
+        </div>
+
+        <div style="background:#0d0d0d;border:1px solid #1e1e1e;border-radius:12px;padding:10px;margin-bottom:12px">
+          <div style="font-size:9px;font-family:monospace;color:#5a5550;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;text-align:center">Localisation des anomalies</div>
+          ${buildSvg()}
+        </div>
+
+        <div style="margin-bottom:12px">
+          <div style="font-size:9px;font-family:monospace;color:#5a5550;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Détail des points</div>
+          ${pointsHtml}
+        </div>
+
+        ${comment?'<div style="background:#141414;border:1px solid #1e1e1e;border-radius:10px;padding:12px;margin-bottom:12px"><div style="font-size:9px;font-family:monospace;color:#5a5550;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Commentaire mécanicien</div><div style="font-size:13px;color:#9a9590;line-height:1.7">'+comment+'</div></div>':''}
+
+        <div style="text-align:center;font-family:monospace;font-size:10px;color:#2a2a2a;padding-top:8px">Généré par VéloID · ${new Date().toLocaleString('fr-FR')}</div>
+      </div>
+      <textarea id="dvExportTxt" style="position:absolute;left:-9999px;opacity:0" readonly>${txt}</textarea>
+    </div>`;
   document.body.appendChild(modal);
 }
 
@@ -2711,9 +3429,49 @@ function dvCopyExport(){
   const ta  = document.getElementById('dvExportTxt');
   const btn = document.getElementById('dvCopyExportBtn');
   if(!ta) return;
-  const done = () => { btn.textContent='✓ Copié !'; setTimeout(()=>{ btn.textContent='📋 Copier le rapport'; },2500); };
+  const done = () => { btn.textContent='✓ Copié !'; setTimeout(()=>{ btn.textContent='📋 Copier'; },2500); };
   if(navigator.clipboard){ navigator.clipboard.writeText(ta.value).then(done).catch(()=>{ ta.select(); document.execCommand('copy'); done(); }); }
   else { ta.select(); ta.setSelectionRange(0,99999); document.execCommand('copy'); done(); }
+}
+
+function dvShareReport(){
+  const ta  = document.getElementById('dvExportTxt');
+  const btn = document.getElementById('dvShareBtn');
+  if(!ta) return;
+  const txt = ta.value;
+  const f = dvGetFiche();
+  const clientLine = [f.prenom, f.nom].filter(Boolean).join(' ');
+  const veloLine   = [f.marque, f.modele].filter(Boolean).join(' ');
+  const title = 'Rapport diagnostic vélo' + (clientLine?' — '+clientLine:'') + (veloLine?' — '+veloLine:'');
+
+  // Web Share API — fonctionne sur Android Chrome et iOS Safari
+  if(navigator.share){
+    navigator.share({ title: title, text: txt })
+      .then(() => { btn.textContent='✓ Partagé !'; setTimeout(()=>{ btn.textContent='✉️ Partager'; },2000); })
+      .catch(() => {}); // Annulé par l'utilisateur
+    return;
+  }
+
+  // Fallback : copie + ouvre mail vide avec sujet seulement
+  const copied = () => {
+    btn.textContent='✓ Copié !';
+    setTimeout(()=>{ btn.textContent='✉️ Partager'; },2500);
+    // Mail avec sujet pré-rempli, coller le rapport dans le corps
+    const subject = encodeURIComponent(title);
+    const mailTo  = f.mail ? 'mailto:'+f.mail+'?subject='+subject : 'mailto:?subject='+subject;
+    setTimeout(() => { window.location.href = mailTo; }, 400);
+  };
+
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(()=>{
+      alert('Rapport copié !\n\nVotre application Mail va s\'ouvrir.\nCollez le rapport dans le corps du message (maintien du doigt → Coller).');
+      copied();
+    });
+  } else {
+    ta.select(); ta.setSelectionRange(0,99999); document.execCommand('copy');
+    alert('Rapport copié !\n\nVotre application Mail va s\'ouvrir.\nCollez le rapport dans le corps du message.');
+    copied();
+  }
 }
 
 function dvReset(){
@@ -2724,18 +3482,20 @@ function dvReset(){
     if(!p.zone) return;
     const m = document.getElementById(p.zone);
     if(m){
-      m.setAttribute('fill','#333');
+      m.setAttribute('fill','#1e1e1e');
       m.setAttribute('stroke','#555');
-      m.setAttribute('r','7');
-      const t = m.nextElementSibling;
+      m.setAttribute('r','10');
+      const mId = p.zone.replace('dvM','dvMt');
+      const t = document.getElementById(mId);
       if(t) t.setAttribute('fill','#9a9590');
     }
   });
   document.getElementById('dvScroll').scrollTo({ top:0, behavior:'smooth' });
 }
 
-// Init au chargement de l'écran
+// Init au chargement
 document.addEventListener('DOMContentLoaded', () => { dvInit(); });
+
 
 // SEARCH
 // ═══════════════════════════════
@@ -3199,6 +3959,8 @@ function calcRayonnage(){
 
   res.classList.add('show');
   document.getElementById('rayResult').scrollIntoView({behavior:'smooth',block:'nearest'});
+  // Calcul tension
+  if(typeof calcTensionRayons==='function') calcTensionRayons(lenG,lenD,dg,dd,pcdG,pcdD,old);
 }
 
 // ═══════════════════════════════
@@ -4076,6 +4838,511 @@ function showResult(){
 // ═══════════════════════════════
 // SPLASH
 // ═══════════════════════════════
+
+// ══════════════════════════════════════════
+// TOAST NOTIFICATION
+// ══════════════════════════════════════════
+function showToast(msg, isError=false){
+  const t = document.getElementById('veloToast');
+  if(!t) return;
+  t.textContent = msg;
+  t.className = 'velo-toast' + (isError?' error':'');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+// ══════════════════════════════════════════
+// HISTORIQUE — localStorage
+// ══════════════════════════════════════════
+function histSave(){
+  const filled = DV_POINTS.filter(p => dvState[p.id].status !== null);
+  if(!filled.length){ showToast('Aucun point contrôlé', true); return; }
+  const f = dvGetFiche();
+  let penalite = 0;
+  filled.forEach(p => { penalite += DV_STATUS[dvState[p.id].status].score; });
+  const score = Math.max(0, Math.round(100-(penalite/Math.max(filled.length*80,1))*100));
+  const counts = {ok:0,warn:0,fix:0,replace:0,danger:0};
+  filled.forEach(p => { if(counts[dvState[p.id].status]!==undefined) counts[dvState[p.id].status]++; });
+
+  const entry = {
+    id: Date.now(),
+    date: new Date().toLocaleDateString('fr-FR'),
+    ts: Date.now(),
+    client: { nom:f.nom, prenom:f.prenom, tel:f.tel, mail:f.mail },
+    velo: { marque:f.marque, modele:f.modele, annee:f.annee, type:f.type, couleur:f.couleur, serie:f.serie, km:f.km },
+    atelier: { meca:f.meca, atelier:f.atelier },
+    score, counts,
+    points: DV_POINTS.reduce((acc,p)=>{ acc[p.id]=dvState[p.id]; return acc; }, {}),
+    comment: document.getElementById('dvSumComment')?.value || ''
+  };
+
+  const hist = histLoad();
+  hist.unshift(entry);
+  if(hist.length > 50) hist.pop(); // max 50
+  try { localStorage.setItem('veloid_hist', JSON.stringify(hist)); } catch(e){}
+  showToast('✓ Diagnostic sauvegardé !');
+}
+
+function histLoad(){
+  try { return JSON.parse(localStorage.getItem('veloid_hist')||'[]'); } catch(e){ return []; }
+}
+
+function histRender(){
+  const hist = histLoad();
+  const el = document.getElementById('histList');
+  const cnt = document.getElementById('histCount');
+  if(!el) return;
+  if(cnt) cnt.textContent = hist.length + ' diagnostic(s) sauvegardé(s)';
+  if(!hist.length){
+    el.innerHTML = '<div class="hist-empty">📋 Aucun diagnostic sauvegardé<br>Réalisez un diagnostic et appuyez sur<br><strong>💾 Sauvegarder</strong></div>';
+    return;
+  }
+  el.innerHTML = hist.map((h,idx) => {
+    const clientLine = [h.client.prenom, h.client.nom].filter(Boolean).join(' ') || '— Client inconnu —';
+    const veloLine   = [h.velo.marque, h.velo.modele, h.velo.annee].filter(Boolean).join(' ') || '— Vélo non renseigné —';
+    const scoreCol   = h.score>=80?'#22c55e':h.score>=60?'#f97316':'#ef4444';
+    const tags = [
+      h.counts.danger  ? `<span class="hist-tag" style="background:rgba(168,85,247,.15);color:#a855f7">⚠️ ${h.counts.danger} danger</span>` : '',
+      h.counts.replace ? `<span class="hist-tag" style="background:rgba(239,68,68,.12);color:#ef4444">🔴 ${h.counts.replace} remplacer</span>` : '',
+      h.counts.fix     ? `<span class="hist-tag" style="background:rgba(249,115,22,.12);color:#f97316">🔧 ${h.counts.fix} régler</span>` : '',
+      h.counts.ok      ? `<span class="hist-tag" style="background:rgba(34,197,94,.12);color:#22c55e">✓ ${h.counts.ok} OK</span>` : '',
+    ].filter(Boolean).join('');
+    return `<div class="hist-card">
+      <div class="hist-card-hdr">
+        <div class="hist-score-dot" style="background:${scoreCol}">${h.score}</div>
+        <div class="hist-info">
+          <div class="hist-client">${clientLine}</div>
+          <div class="hist-velo">${veloLine}</div>
+          <div class="hist-date">${h.date}${h.atelier.atelier?' · '+h.atelier.atelier:''}</div>
+        </div>
+      </div>
+      <div class="hist-tags">${tags}</div>
+      <div class="hist-card-btns">
+        <button class="hist-open-btn" onclick="histRestore(${idx})">↩ Rouvrir</button>
+        <button class="hist-devis-btn" onclick="histToDevis(${idx})">€ Devis</button>
+        <button class="hist-del-btn" onclick="histDelete(${idx})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function histDelete(idx){
+  const hist = histLoad();
+  hist.splice(idx,1);
+  try { localStorage.setItem('veloid_hist', JSON.stringify(hist)); } catch(e){}
+  histRender();
+  showToast('Diagnostic supprimé');
+}
+
+function histClearAll(){
+  if(!confirm("Effacer tout l'historique ?")) return;
+  try { localStorage.removeItem('veloid_hist'); } catch(e){}
+  histRender();
+  showToast('Historique effacé');
+}
+
+function histRestore(idx){
+  const hist = histLoad();
+  const h = hist[idx];
+  if(!h) return;
+
+  // Remplir fiche client
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.value=v||''; };
+  set('dvClientNom', h.client.nom); set('dvClientPrenom', h.client.prenom);
+  set('dvClientTel', h.client.tel); set('dvClientMail', h.client.mail);
+  set('dvVeloMarque', h.velo.marque); set('dvVeloModele', h.velo.modele);
+  set('dvVeloAnnee', h.velo.annee); set('dvVeloCouleur', h.velo.couleur);
+  set('dvVeloSerie', h.velo.serie); set('dvVeloKm', h.velo.km);
+  set('dvMeca', h.atelier.meca); set('dvAtelier', h.atelier.atelier);
+  const typeEl = document.getElementById('dvVeloType');
+  if(typeEl) typeEl.value = h.velo.type||'';
+
+  // Réinitialiser et remplir état
+  dvInit();
+  DV_POINTS.forEach(p => {
+    const s = h.points[p.id];
+    if(!s || !s.status) return;
+    dvState[p.id] = { ...s };
+    // Mettre à jour l'UI carte
+    const card = document.getElementById('dvCard'+p.id);
+    if(!card) return;
+    const st = DV_STATUS[s.status];
+    card.className = 'dv-card open st-'+s.status;
+    card.querySelectorAll('.dv-st-btn').forEach(b => {
+      if(b.onclick?.toString().includes("'"+s.status+"'")) b.classList.add(st.cls);
+    });
+    if(s.priority){
+      const pClass = 'p-'+s.priority;
+      card.querySelectorAll('.dv-prio-btn').forEach(b => { if(b.classList.contains(pClass)) b.classList.add(pClass); });
+    }
+    const noteEl = document.getElementById('dvNote'+p.id);
+    if(noteEl) noteEl.value = s.note||'';
+    const actEl = document.getElementById('dvAction'+p.id);
+    if(actEl) actEl.value = s.action||'';
+    // Badge
+    const badge = document.getElementById('dvBadge'+p.id);
+    if(badge){ badge.style.display='flex'; badge.style.background=st.col+'22'; badge.style.color=st.col; badge.textContent=st.label; }
+    // Marqueur
+    if(p.zone){
+      const m=document.getElementById(p.zone);
+      if(m){ m.setAttribute('fill',st.col); m.setAttribute('stroke',st.col); m.setAttribute('r','10'); }
+      const mt=document.getElementById(p.zone.replace('dvM','dvMt'));
+      if(mt) mt.setAttribute('fill','#fff');
+    }
+  });
+  const cmtEl = document.getElementById('dvSumComment');
+  if(cmtEl) cmtEl.value = h.comment||'';
+
+  dvUpdateScore();
+  dvUpdateSummary();
+  showScreen('diagvelo');
+  showToast('✓ Diagnostic restauré');
+}
+
+function histToDevis(idx){
+  const hist = histLoad();
+  const h = hist[idx];
+  if(!h) return;
+  const clientLine = [h.client.prenom, h.client.nom].filter(Boolean).join(' ');
+  const veloLine   = [h.velo.marque, h.velo.modele].filter(Boolean).join(' ');
+  const nameEl = document.getElementById('devisClientName');
+  if(nameEl) nameEl.textContent = (clientLine||'Client') + (veloLine?' — '+veloLine:'');
+
+  // Pré-remplir lignes depuis les points non-OK
+  devisReset(true);
+  DV_POINTS.forEach(p => {
+    const s = h.points[p.id];
+    if(!s || s.status==='ok' || !s.status) return;
+    const st = DV_STATUS[s.status];
+    devisAddLine(p.name + (s.action?' — '+s.action:''), 1, 0);
+  });
+  devisCalc();
+  showScreen('devis');
+  showToast('✓ Lignes importées depuis le diagnostic');
+}
+
+// ══════════════════════════════════════════
+// DEVIS RAPIDE
+// ══════════════════════════════════════════
+let devisLines = [];
+
+function devisInit(){
+  devisLines = [];
+  devisAddLine('', 1, 0);
+  devisAddLine('', 1, 0);
+  devisCalc();
+}
+
+function devisAddLine(desc='', qty=1, prix=0){
+  const id = Date.now() + Math.random();
+  devisLines.push({ id, desc, qty, prix });
+  devisRenderLines();
+  devisCalc();
+}
+
+function devisRenderLines(){
+  const container = document.getElementById('devisLines');
+  if(!container) return;
+  container.innerHTML = devisLines.map((l,i) => `
+    <div class="devis-line" id="dline_${i}">
+      <input class="devis-line-desc-inp" type="text" placeholder="Description prestation ou pièce…"
+        value="${l.desc.replace(/"/g,'&quot;')}"
+        oninput="devisLines[${i}].desc=this.value">
+      <div class="devis-line-row">
+        <div class="devis-num-wrap">
+          <div class="devis-num-lbl">Qté</div>
+          <input class="devis-num-inp" type="number" value="${l.qty}" min="0" step="1" inputmode="numeric"
+            oninput="devisLines[${i}].qty=parseFloat(this.value)||0;devisCalc()">
+        </div>
+        <div class="devis-num-wrap">
+          <div class="devis-num-lbl">Prix HT (€)</div>
+          <input class="devis-num-inp" type="number" value="${l.prix||''}" min="0" step="0.01" inputmode="decimal"
+            placeholder="0,00"
+            oninput="devisLines[${i}].prix=parseFloat(this.value)||0;devisCalc()">
+        </div>
+        <div class="devis-num-wrap">
+          <div class="devis-num-lbl">Total HT</div>
+          <div class="devis-line-total">${((l.qty||0)*(l.prix||0)).toFixed(2)} €</div>
+        </div>
+        <button class="devis-del" onclick="devisDelLine(${i})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function devisDelLine(i){
+  devisLines.splice(i,1);
+  devisRenderLines();
+  devisCalc();
+}
+
+function devisCalc(){
+  const tvaRate = parseFloat(document.getElementById('devisTva')?.value||'20')/100;
+  const ht = devisLines.reduce((s,l)=>s+(l.qty||0)*(l.prix||0), 0);
+  const tva = ht * tvaRate;
+  const ttc = ht + tva;
+
+  const linesEl = document.getElementById('devisTotalLines');
+  if(linesEl){
+    const rows = devisLines.filter(l=>(l.qty||0)*(l.prix||0)>0)
+      .map(l=>`<div class="devis-total-line"><span>${l.desc||'—'} ×${l.qty}</span><span>${((l.qty||0)*(l.prix||0)).toFixed(2)} €</span></div>`)
+      .join('');
+    linesEl.innerHTML = rows + `
+      <div class="devis-total-line"><span>Total HT</span><span>${ht.toFixed(2)} €</span></div>
+      <div class="devis-total-line"><span>TVA ${(tvaRate*100).toFixed(0)}%</span><span>${tva.toFixed(2)} €</span></div>`;
+  }
+  const gtEl = document.getElementById('devisGrandTotal');
+  if(gtEl) gtEl.textContent = ttc.toFixed(2).replace('.',',') + ' €';
+
+  // Update totals in lines render
+  devisRenderLines();
+}
+
+function devisFromDiag(){
+  const f = dvGetFiche();
+  const clientLine = [f.prenom, f.nom].filter(Boolean).join(' ');
+  const veloLine   = [f.marque, f.modele].filter(Boolean).join(' ');
+  const nameEl = document.getElementById('devisClientName');
+  if(nameEl) nameEl.textContent = (clientLine||'Client') + (veloLine?' — '+veloLine:'');
+
+  const filled = DV_POINTS.filter(p => dvState[p.id].status && dvState[p.id].status!=='ok');
+  if(filled.length){
+    devisLines = [];
+    filled.forEach(p => {
+      const s = dvState[p.id];
+      devisLines.push({ id:Date.now()+Math.random(), desc: p.name+(s.action?' — '+s.action:''), qty:1, prix:0 });
+    });
+    devisRenderLines(); devisCalc();
+    showToast('✓ Points importés depuis le diagnostic');
+  } else {
+    showToast('Aucun point à importer', true);
+  }
+}
+
+function devisReset(silent=false){
+  devisLines = [];
+  const nameEl = document.getElementById('devisClientName');
+  if(nameEl) nameEl.textContent = '— Aucun client sélectionné —';
+  devisAddLine('',1,0); devisAddLine('',1,0);
+  devisCalc();
+  if(!silent) showToast('Devis réinitialisé');
+}
+
+function devisBuildText(){
+  const tvaRate = parseFloat(document.getElementById('devisTva')?.value||'20')/100;
+  const ht  = devisLines.reduce((s,l)=>s+(l.qty||0)*(l.prix||0),0);
+  const tva = ht*tvaRate;
+  const ttc = ht+tva;
+  const clientName = document.getElementById('devisClientName')?.textContent||'';
+  const date = new Date().toLocaleDateString('fr-FR');
+
+  let txt = 'DEVIS — VéloID\n';
+  txt += '════════════════════════════\n';
+  txt += 'Date : '+date+'\n';
+  if(clientName && clientName!=='— Aucun client sélectionné —') txt += 'Client : '+clientName+'\n';
+  txt += '\n';
+  devisLines.forEach(l => {
+    if(!(l.qty&&l.prix)) return;
+    txt += `${l.desc||'Prestation'} × ${l.qty}  →  ${((l.qty||0)*(l.prix||0)).toFixed(2)} €\n`;
+  });
+  txt += '\n────────────────────────────\n';
+  txt += `Total HT  :  ${ht.toFixed(2)} €\n`;
+  txt += `TVA ${(tvaRate*100).toFixed(0)}%   :  ${tva.toFixed(2)} €\n`;
+  txt += `TOTAL TTC :  ${ttc.toFixed(2)} €\n`;
+  txt += '────────────────────────────\nGénéré par VéloID';
+  return txt;
+}
+
+function devisCopy(){
+  const txt = devisBuildText();
+  const btn = document.getElementById('devisCopyBtn');
+  const done = ()=>{ btn.textContent='✓ Copié !'; setTimeout(()=>{ btn.textContent='📋 Copier'; },2200); };
+  if(navigator.clipboard) navigator.clipboard.writeText(txt).then(done);
+  else{ const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); }
+}
+
+function devisShare(){
+  const txt = devisBuildText();
+  const clientName = document.getElementById('devisClientName')?.textContent||'';
+  const title = 'Devis VéloID' + (clientName&&clientName!=='— Aucun client sélectionné —'?' — '+clientName:'');
+  if(navigator.share){ navigator.share({title, text:txt}).catch(()=>{}); return; }
+  if(navigator.clipboard){ navigator.clipboard.writeText(txt).then(()=>showToast('✓ Devis copié !')); }
+}
+
+// ══════════════════════════════════════════
+// BIBLIOTHÈQUE CLIENTS — localStorage
+// ══════════════════════════════════════════
+let biblioEditId = null;
+
+function biblioLoad(){
+  try { return JSON.parse(localStorage.getItem('veloid_clients')||'[]'); } catch(e){ return []; }
+}
+
+function biblioSaveAll(data){
+  try { localStorage.setItem('veloid_clients', JSON.stringify(data)); } catch(e){ showToast('Erreur sauvegarde',true); }
+}
+
+function biblioRender(){
+  const q    = (document.getElementById('biblioSearch')?.value||'').toLowerCase();
+  const data = biblioLoad().filter(c => {
+    const s = [c.prenom,c.nom,c.tel,c.mail,c.velos?.map(v=>v.marque+' '+v.modele).join(' ')].join(' ').toLowerCase();
+    return !q || s.includes(q);
+  });
+  const el = document.getElementById('biblioList');
+  if(!el) return;
+  if(!data.length){
+    el.innerHTML = q
+      ? '<div class="biblio-empty">🔍 Aucun résultat pour « '+q+' »</div>'
+      : '<div class="biblio-empty">📋 Aucun client enregistré<br>Appuyez sur <strong>Nouveau client</strong></div>';
+    return;
+  }
+  el.innerHTML = data.map((c,i) => {
+    const initials = ((c.prenom||'?')[0]+(c.nom||'?')[0]).toUpperCase();
+    const veloTags = (c.velos||[]).map(v=>`<span class="biblio-velo-tag">${[v.marque,v.modele,v.annee].filter(Boolean).join(' ')}</span>`).join('');
+    return `<div class="biblio-card">
+      <div class="biblio-card-top">
+        <div class="biblio-avatar">${initials}</div>
+        <div class="biblio-info">
+          <div class="biblio-name">${[c.prenom,c.nom].filter(Boolean).join(' ')||'—'}</div>
+          <div class="biblio-contact">${c.tel?'📞 '+c.tel+'<br>':''} ${c.mail?'✉️ '+c.mail:''}</div>
+        </div>
+      </div>
+      ${veloTags?`<div class="biblio-velos">${veloTags}</div>`:''}
+      <div class="biblio-btns" style="margin-top:9px">
+        <button class="biblio-use-btn" onclick="biblioUse(${i})">↩ Importer</button>
+        <button class="biblio-diag-btn" onclick="biblioDiag(${i})">🔍 Diagnostic</button>
+        <button class="biblio-del-btn" onclick="biblioDelete(${i})" title="Supprimer">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function biblioOpenModal(editIdx=null){
+  biblioEditId = editIdx;
+  const modal = document.getElementById('biblioModal');
+  if(!modal) return;
+  const title = document.getElementById('biblioModalTitle');
+  if(title) title.textContent = editIdx!==null ? 'Modifier client' : 'Nouveau client';
+
+  const fields = ['bmPrenom','bmNom','bmTel','bmMail','bmMarque','bmModele','bmAnnee','bmType','bmNotes'];
+  fields.forEach(id=>{ const e=document.getElementById(id); if(e) e.value=''; });
+
+  if(editIdx!==null){
+    const c = biblioLoad()[editIdx];
+    if(c){
+      const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+      set('bmPrenom',c.prenom); set('bmNom',c.nom); set('bmTel',c.tel); set('bmMail',c.mail);
+      set('bmNotes',c.notes);
+      if(c.velos&&c.velos[0]){
+        set('bmMarque',c.velos[0].marque); set('bmModele',c.velos[0].modele);
+        set('bmAnnee',c.velos[0].annee); set('bmType',c.velos[0].type);
+      }
+    }
+  }
+  modal.style.display='flex';
+  setTimeout(()=>document.getElementById('bmPrenom')?.focus(), 200);
+}
+
+function biblioCloseModal(){
+  const modal = document.getElementById('biblioModal');
+  if(modal) modal.style.display='none';
+  biblioEditId = null;
+}
+
+function biblioSave(){
+  const get=(id)=>document.getElementById(id)?.value?.trim()||'';
+  const prenom=get('bmPrenom'), nom=get('bmNom');
+  if(!prenom&&!nom){ showToast('Entrez au moins un nom',true); return; }
+
+  const client = {
+    id: Date.now(),
+    prenom, nom,
+    tel: get('bmTel'), mail: get('bmMail'), notes: get('bmNotes'),
+    velos: [{marque:get('bmMarque'),modele:get('bmModele'),annee:get('bmAnnee'),type:get('bmType')}].filter(v=>v.marque||v.modele)
+  };
+
+  const data = biblioLoad();
+  if(biblioEditId!==null){ data[biblioEditId]={...data[biblioEditId],...client}; }
+  else { data.unshift(client); }
+  biblioSaveAll(data);
+  biblioCloseModal();
+  biblioRender();
+  showToast('✓ Client enregistré !');
+}
+
+function biblioDelete(idx){
+  if(!confirm('Supprimer ce client ?')) return;
+  const data = biblioLoad();
+  data.splice(idx,1);
+  biblioSaveAll(data);
+  biblioRender();
+  showToast('Client supprimé');
+}
+
+function biblioUse(idx){
+  // Remplir la fiche client du diagnostic
+  const c = biblioLoad()[idx];
+  if(!c) return;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||'';};
+  set('dvClientNom',c.nom); set('dvClientPrenom',c.prenom);
+  set('dvClientTel',c.tel); set('dvClientMail',c.mail);
+  if(c.velos&&c.velos[0]){
+    set('dvVeloMarque',c.velos[0].marque); set('dvVeloModele',c.velos[0].modele);
+    set('dvVeloAnnee',c.velos[0].annee);
+    const t=document.getElementById('dvVeloType'); if(t) t.value=c.velos[0].type||'';
+  }
+  showToast('✓ Client importé dans le diagnostic');
+}
+
+function biblioDiag(idx){
+  biblioUse(idx);
+  showScreen('diagvelo');
+}
+
+// ══════════════════════════════════════════
+// SAVE BUTTON dans diagnostic
+// ══════════════════════════════════════════
+// Ajout d'un bouton sauvegarder dans le header du diag
+(function addSaveBtn(){
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const hdr = document.querySelector('#diagvelo .diag-hdr');
+    if(!hdr) return;
+    const btn = document.createElement('button');
+    btn.textContent = '💾';
+    btn.title = 'Sauvegarder le diagnostic';
+    btn.style.cssText = 'height:32px;padding:0 10px;background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.3);border-radius:8px;color:#22c55e;font-size:16px;cursor:pointer;flex-shrink:0;margin-right:6px';
+    btn.onclick = ()=>{ histSave(); };
+    // Insert before export button
+    const expBtn = hdr.querySelector('.dv-export-btn');
+    if(expBtn) hdr.insertBefore(btn, expBtn);
+    else hdr.appendChild(btn);
+  });
+})();
+
+// ══════════════════════════════════════════
+// PWA — Service Worker
+// ══════════════════════════════════════════
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    // Inline service worker as blob
+    const swCode = `
+      const CACHE = 'veloid-v1';
+      const URLS  = [self.location.href];
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(URLS)));
+        self.skipWaiting();
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request).catch(()=>caches.match(e.request))));
+      });
+    `;
+    const blob = new Blob([swCode], {type:'application/javascript'});
+    const url  = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(()=>{});
+  });
+}
+
+
 window.addEventListener('load',()=>{
   setTimeout(()=>{
     document.getElementById('splash').classList.remove('active');
@@ -4083,5 +5350,519 @@ window.addEventListener('load',()=>{
   },1600);
 });
 </script>
-</body>
+
+<!-- ══ HISTORIQUE DES DIAGNOSTICS ══ -->
+<div class="screen" id="historique">
+  <div class="diag-hdr">
+    <div class="btn-back" onclick="goHome()">‹</div>
+    <div class="dh-info">
+      <div class="dh-title">Historique</div>
+      <div class="dh-step">Diagnostics sauvegardés localement</div>
+    </div>
+  </div>
+  <div class="hist-scroll" id="histScroll">
+    <div class="hist-top-bar">
+      <div class="hist-count" id="histCount">0 diagnostic(s)</div>
+      <button class="hist-clear-btn" onclick="histClearAll()">Tout effacer</button>
+    </div>
+    <div id="histList"></div>
+  </div>
+</div>
+
+<!-- ══ DEVIS RAPIDE ══ -->
+<div class="screen" id="devis">
+  <div class="diag-hdr">
+    <div class="btn-back" onclick="goHome()">‹</div>
+    <div class="dh-info">
+      <div class="dh-title">Devis Rapide</div>
+      <div class="dh-step">Prestations + pièces · total TTC</div>
+    </div>
+  </div>
+  <div class="devis-scroll" id="devisScroll">
+
+    <!-- Client bar -->
+    <div class="devis-client-bar">
+      <div style="flex:1">
+        <div class="devis-client-txt">Client</div>
+        <div class="devis-client-name" id="devisClientName">— Aucun client sélectionné —</div>
+      </div>
+      <button class="devis-from-diag-btn" onclick="devisFromDiag()">↙ Importer diag.</button>
+    </div>
+
+    <!-- Lignes de prestation -->
+    <div class="devis-section-lbl">Prestations &amp; pièces</div>
+    <div class="devis-lines" id="devisLines"></div>
+    <button class="devis-add-btn" onclick="devisAddLine()">+ Ajouter une ligne</button>
+
+    <!-- TVA -->
+    <div class="devis-tva-row">
+      <span class="devis-tva-lbl">TVA</span>
+      <select class="devis-tva-sel" id="devisTva" onchange="devisCalc()">
+        <option value="0">Sans TVA (HT)</option>
+        <option value="5.5">5,5%</option>
+        <option value="10">10%</option>
+        <option value="20" selected>20%</option>
+      </select>
+    </div>
+
+    <!-- Total -->
+    <div class="devis-total-card" id="devisTotalCard">
+      <div class="devis-section-lbl" style="margin-bottom:10px">Récapitulatif</div>
+      <div id="devisTotalLines"></div>
+      <div class="devis-grand">
+        <div class="devis-grand-lbl">TOTAL TTC</div>
+        <div class="devis-grand-val" id="devisGrandTotal">0,00 €</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="devis-btns">
+      <button class="devis-copy-btn" onclick="devisCopy()" id="devisCopyBtn">📋 Copier</button>
+      <button class="devis-share-btn" onclick="devisShare()">↗ Partager</button>
+      <button class="devis-reset-btn" onclick="devisReset()">↺</button>
+    </div>
+
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══ BIBLIOTHÈQUE CLIENTS ══ -->
+<div class="screen" id="biblio">
+  <div class="diag-hdr">
+    <div class="btn-back" onclick="goHome()">‹</div>
+    <div class="dh-info">
+      <div class="dh-title">Clients &amp; Vélos</div>
+      <div class="dh-step">Bibliothèque · fiches réutilisables</div>
+    </div>
+  </div>
+  <div class="biblio-scroll">
+    <div class="biblio-searchbar">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="#5a5550" stroke-width="2"/><path d="m16 16 4 4" stroke="#5a5550" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="search" id="biblioSearch" placeholder="Chercher un client…" oninput="biblioRender()">
+    </div>
+    <button class="biblio-new-btn" onclick="biblioOpenModal()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><line x1="12" y1="5" x2="12" y2="19" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
+      Nouveau client
+    </button>
+    <div id="biblioList"></div>
+  </div>
+</div>
+
+<!-- Modale ajout/edit client -->
+<div class="velo-modal-overlay" id="biblioModal" style="display:none" onclick="biblioCloseModal()">
+  <div class="velo-modal-sheet" onclick="event.stopPropagation()">
+    <div class="velo-modal-handle"></div>
+    <div class="velo-modal-title" id="biblioModalTitle">Nouveau client</div>
+    <div class="velo-modal-body">
+      <div class="velo-modal-row">
+        <div class="velo-modal-field">
+          <div class="velo-modal-lbl">Prénom</div>
+          <input class="velo-modal-inp" type="text" id="bmPrenom" placeholder="Jean" autocomplete="given-name">
+        </div>
+        <div class="velo-modal-field">
+          <div class="velo-modal-lbl">Nom</div>
+          <input class="velo-modal-inp" type="text" id="bmNom" placeholder="Dupont" autocomplete="family-name">
+        </div>
+      </div>
+      <div class="velo-modal-field">
+        <div class="velo-modal-lbl">Téléphone</div>
+        <input class="velo-modal-inp" type="tel" id="bmTel" placeholder="06 12 34 56 78" autocomplete="tel">
+      </div>
+      <div class="velo-modal-field">
+        <div class="velo-modal-lbl">Email</div>
+        <input class="velo-modal-inp" type="email" id="bmMail" placeholder="jean@mail.com" autocomplete="email">
+      </div>
+      <div class="velo-modal-row">
+        <div class="velo-modal-field">
+          <div class="velo-modal-lbl">Marque vélo</div>
+          <input class="velo-modal-inp" type="text" id="bmMarque" placeholder="Trek, Specialized…">
+        </div>
+        <div class="velo-modal-field">
+          <div class="velo-modal-lbl">Modèle</div>
+          <input class="velo-modal-inp" type="text" id="bmModele" placeholder="Domane, Tarmac…">
+        </div>
+      </div>
+      <div class="velo-modal-row">
+        <div class="velo-modal-field">
+          <div class="velo-modal-lbl">Année</div>
+          <input class="velo-modal-inp" type="number" id="bmAnnee" placeholder="2023" inputmode="numeric">
+        </div>
+        <div class="velo-modal-field">
+          <div class="velo-modal-lbl">Type</div>
+          <select class="velo-modal-inp" id="bmType">
+            <option value="">—</option>
+            <option>Route</option><option>Gravel</option><option>VTT XC</option>
+            <option>VTT Trail</option><option>VTT Enduro</option><option>E-Bike</option>
+            <option>Ville</option><option>BMX</option><option>Autre</option>
+          </select>
+        </div>
+      </div>
+      <div class="velo-modal-field">
+        <div class="velo-modal-lbl">Notes</div>
+        <input class="velo-modal-inp" type="text" id="bmNotes" placeholder="Taille cadre, particularités…">
+      </div>
+    </div>
+    <button class="velo-modal-save" onclick="biblioSave()">💾 Enregistrer</button>
+    <button class="velo-modal-cancel" onclick="biblioCloseModal()">Annuler</button>
+  </div>
+</div>
+
+<!-- Toast global -->
+<div class="velo-toast" id="veloToast"></div>
+
+<!-- ══ COMPATIBILITÉ CHAÎNE/CASSETTE ══ -->
+<div class="screen" id="compat">
+  <div class="diag-hdr">
+    <div class="btn-back" onclick="goHome()">‹</div>
+    <div class="dh-info">
+      <div class="dh-title">Compatibilité Chaîne/Cassette</div>
+      <div class="dh-step">Références · alertes croisées · largeurs</div>
+    </div>
+  </div>
+  <div class="compat-scroll">
+    <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#22c55e;line-height:1.6">
+      🔗 Sélectionnez la <strong>marque</strong>, le nombre de <strong>vitesses</strong> pour obtenir les références chaînes compatibles et les alertes croisées.
+    </div>
+    <div class="compat-section">
+      <div class="compat-section-hdr">
+        <span class="compat-section-hdr-title">Configuration</span>
+      </div>
+      <div class="compat-section-body">
+        <div class="compat-field-lbl">Fabricant</div>
+        <div class="compat-chip-row" id="cmp_marq">
+          <div class="compat-chip" onclick="cmpPick('marq','shimano',this)">Shimano</div>
+          <div class="compat-chip" onclick="cmpPick('marq','sram',this)">SRAM</div>
+          <div class="compat-chip" onclick="cmpPick('marq','campa',this)">Campagnolo</div>
+          <div class="compat-chip" onclick="cmpPick('marq','kmc',this)">KMC</div>
+          <div class="compat-chip" onclick="cmpPick('marq','connex',this)">Connex</div>
+        </div>
+        <div class="compat-field-lbl">Vitesses</div>
+        <div class="compat-chip-row" id="cmp_vit">
+          <div class="compat-chip" onclick="cmpPick('vit','678',this)">6/7/8v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','9',this)">9v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','10',this)">10v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','11',this)">11v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','12',this)">12v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','13',this)">13v</div>
+        </div>
+        <button class="compat-calc-btn" onclick="cmpCompute()">🔍 Trouver les compatibilités</button>
+      </div>
+    </div>
+    <div class="compat-result" id="cmpResult">
+      <div class="compat-result-title">✓ Chaînes compatibles</div>
+      <div class="compat-chain-list" id="cmpChainList"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:12px 0 7px">Alertes &amp; compatibilités cassettes</div>
+      <div class="compat-alert-list" id="cmpAlerts"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:12px 0 7px">Largeur de chaîne &amp; cassettes</div>
+      <div class="compat-chain-list" id="cmpLargeur"></div>
+    </div>
+    <div style="height:20px"></div>
+  </div>
+</div>
+
+<!-- ══ GLOSSAIRE ══ -->
+<div class="screen" id="glossaire">
+  <div class="diag-hdr">
+    <div class="btn-back" onclick="goHome()">‹</div>
+    <div class="dh-info">
+      <div class="dh-title">Glossaire Technique</div>
+      <div class="dh-step">Lexique atelier · FR/EN · 50+ termes</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;height:calc(100% - 54px);overflow:hidden">
+    <div class="glos-search" style="flex-shrink:0">
+      <svg width="16" height="16" fill="none" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="#5a5550" stroke-width="2"/><path d="m16 16 4 4" stroke="#5a5550" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="search" id="glosSearch" placeholder="Chercher un terme…" oninput="glosFilter()">
+    </div>
+    <div class="glos-letter-bar" id="glosLetterBar" style="flex-shrink:0"></div>
+    <div class="glos-scroll" id="glosContent" style="flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch"></div>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="screen" id="settings">
+  <div class="diag-hdr">
+    <div class="btn-back" onclick="goHome()">‹</div>
+    <div class="dh-info">
+      <div class="dh-title">Paramètres</div>
+      <div class="dh-step">Préférences · langue · thème</div>
+    </div>
+  </div>
+  <div class="settings-scroll">
+    <div class="settings-section-title">Apparence</div>
+    <div class="settings-group">
+      <div class="settings-row">
+        <div class="settings-lbl"><strong>Mode sombre / clair</strong><span style="font-size:12px;color:var(--muted);display:block;margin-top:1px">Thème de l'interface</span></div>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()"></button>
+      </div>
+    </div>
+    <div class="settings-section-title">Langue · Language</div>
+    <div class="settings-group">
+      <div class="settings-row">
+        <div class="settings-lbl"><strong>Français / English</strong><span style="font-size:12px;color:var(--muted);display:block;margin-top:1px">Langue de l'interface</span></div>
+        <div class="lang-toggle">
+          <button class="lang-btn" id="settingsLangFR" onclick="setLang('fr')">FR</button>
+          <button class="lang-btn" id="settingsLangEN" onclick="setLang('en')">EN</button>
+        </div>
+      </div>
+    </div>
+    <div class="settings-section-title">À propos</div>
+    <div class="settings-group">
+      <div class="settings-about">
+        <div class="settings-app-name">Vélo<em>ID</em></div>
+        <div class="settings-version">v4.1 · Mai 2026</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.8">
+          Diagnostic · Mesure · Rayonnage<br>
+          Braquet · Couples · Compatibilité<br>
+          Glossaire · Clients · Devis
+        </div>
+      </div>
+    </div>
+    <div style="height:30px"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════
+// LANG & THEME — définis dans le <head> (null-safe)
+// Les fonctions setLang, applyTheme, toggleTheme sont déclarées en tête de document.
+// Ce bloc ne redéclare que les constantes de traduction avancées si besoin.
+// ══════════════════════════════════════════
+const I18N = {};  // réservé pour extensions futures
+
+
+// ══════════════════════════════════════════
+// TENSION RAYONS — calcul complémentaire
+// ══════════════════════════════════════════
+function calcTensionRayons(lenG, lenD, dg, dd, pcdG, pcdD, old) {
+  const angG = Math.atan(dg / (pcdG / 2));
+  const angD = Math.atan(dd / (pcdD / 2));
+  const tensRatio = (Math.sin(angD) * lenG) / (Math.sin(angG) * lenD);
+
+  let usageKey = 'Standard', plage = {min:80,max:110};
+  if(old<=110){usageKey='Route / Gravel';plage={min:80,max:120};}
+  else if(old===148){usageKey='VTT Boost';plage={min:70,max:110};}
+  else if(old===142){usageKey='VTT XC';plage={min:80,max:120};}
+  else if(old>=157){usageKey='DH / E-Bike';plage={min:100,max:140};}
+
+  const kgfG = Math.round(plage.min + ((angG/(Math.PI/3)) * (plage.max-plage.min) * 0.9));
+  const kgfD = Math.round(kgfG * Math.min(tensRatio, 1.0));
+
+  const tensCard = document.getElementById('rayTensionCard');
+  const tensGrid = document.getElementById('tensionGrid');
+  const tensRatioEl = document.getElementById('tensionRatio');
+  if(!tensCard) return;
+
+  const colG = kgfG>=plage.min&&kgfG<=plage.max?'#22c55e':kgfG<plage.min?'#f59e0b':'#ef4444';
+  const colD = kgfD>=plage.min&&kgfD<=plage.max?'#22c55e':kgfD<plage.min?'#f59e0b':'#ef4444';
+  const pctG = Math.min(100,Math.max(10,((kgfG-plage.min)/(plage.max-plage.min+30))*100));
+  const pctD = Math.min(100,Math.max(10,((kgfD-plage.min)/(plage.max-plage.min+30))*100));
+
+  tensGrid.innerHTML = `
+    <div class="tension-side" style="border-left:3px solid #e8400c">
+      <div class="tension-side-lbl">◀ Côté Gauche</div>
+      <div class="tension-nm" style="color:${colG}">${kgfG}<span class="tension-nm-unit"> kgf</span></div>
+      <div class="tension-plage">Cible : ${plage.min}–${plage.max} kgf</div>
+      <div class="tension-gauge-wrap" style="margin-top:7px"><div class="tension-gauge-bar"><div class="tension-gauge-fill" style="width:${pctG}%;background:${colG}"></div></div></div>
+    </div>
+    <div class="tension-side" style="border-left:3px solid #2d7ff9">
+      <div class="tension-side-lbl">Côté Droit ▶</div>
+      <div class="tension-nm" style="color:${colD}">${kgfD}<span class="tension-nm-unit"> kgf</span></div>
+      <div class="tension-plage">Cible : ${plage.min}–${plage.max} kgf</div>
+      <div class="tension-gauge-wrap" style="margin-top:7px"><div class="tension-gauge-bar"><div class="tension-gauge-fill" style="width:${pctD}%;background:${colD}"></div></div></div>
+    </div>`;
+
+  const ratioOk = tensRatio>=0.6&&tensRatio<=1.4;
+  tensRatioEl.innerHTML = `
+    <div class="ray-dg-item" style="margin:8px 0">
+      <div class="ray-dg-label">Usage · ${usageKey}</div>
+      <div class="ray-dg-val" style="color:${ratioOk?'var(--green)':'var(--gold)'}">Ratio D/G : ${tensRatio.toFixed(2)}× ${ratioOk?'✓':'⚠️ Déséquilibré'}</div>
+    </div>`;
+
+  tensCard.classList.add('show');
+}
+
+// ══════════════════════════════════════════
+// COMPATIBILITÉ CHAÎNE/CASSETTE
+// ══════════════════════════════════════════
+const CMP_DATA = {
+  shimano:{
+    '678':{chains:[{ref:'CN-HG71 / CN-HG40',badge:'shimano',note:'6/7/8v — universel toutes marques'},{ref:'KMC Z8',badge:'kmc',note:'Compatible Shimano 8v HG'}],largeur:'7,1–7,3 mm ext.',cassettes:'Shimano HG · SRAM PG · Microshift · SunRace 6/7/8v',alerts:[],ok:['Compatible SRAM 6/7/8v sans adaptateur','Chaîne universelle toutes marques']},
+    '9':{chains:[{ref:'CN-HG53 / CN-HG73',badge:'shimano',note:'9v MTB/route'},{ref:'KMC X9',badge:'kmc',note:'Compatible Shimano/SRAM 9v'}],largeur:'6,5–6,8 mm ext.',cassettes:'Shimano HG · SRAM PG · Microshift 9v',alerts:[],ok:['Compatible SRAM 9v PG']},
+    '10':{chains:[{ref:'CN-HG54 / CN-HG95',badge:'shimano',note:'10v MTB'},{ref:'CN-6701 / CN-5701',badge:'shimano',note:'10v Route'},{ref:'KMC X10',badge:'kmc',note:'10v universel'}],largeur:'6,1–6,3 mm ext.',cassettes:'Shimano HG · SRAM PG 10v',alerts:['⚠️ Campagnolo 10v incompatible — écartement différent'],ok:['Compatible SRAM 10v']},
+    '11':{chains:[{ref:'CN-HG601 / CN-HG701',badge:'shimano',note:'11v MTB'},{ref:'CN-HG601-1 / CN-HG901',badge:'shimano',note:'11v Route'},{ref:'KMC X11',badge:'kmc',note:'11v universel'},{ref:'Connex 11s0',badge:'connex',note:'11v maillon breveté'}],largeur:'5,5–5,65 mm ext.',cassettes:'Shimano HG · SRAM PG/XG 11v',alerts:['⚠️ Campagnolo 11v légèrement différent'],ok:['Compatible SRAM 11v PG/XG','Corps freehub HG (11t mini)']},
+    '12':{chains:[{ref:'CN-M8100 / CN-M7100',badge:'shimano',note:'12v VTT'},{ref:'CN-R9200 / CN-R8100',badge:'shimano',note:'12v Route Dura-Ace/Ultegra'},{ref:'KMC e12 Turbo',badge:'kmc',note:'Compatible Shimano 12v'}],largeur:'5,2–5,3 mm ext.',cassettes:'Shimano 12v MTB (Micro Spline) · Shimano 12v Route (HG+)',alerts:['🚫 INCOMPATIBLE SRAM Eagle','🚫 Micro Spline (MTB) ≠ HG Route','⚠️ Cassettes MTB/route Shimano 12v non interchangeables'],ok:['KMC e12 compatible Shimano 12v']}
+  },
+  sram:{
+    '678':{chains:[{ref:'PC-830',badge:'sram',note:'8v SRAM'},{ref:'KMC Z8',badge:'kmc',note:'Compatible SRAM 8v'}],largeur:'7,1–7,3 mm ext.',cassettes:'SRAM PG · Shimano HG',alerts:[],ok:['Compatible Shimano 6/7/8v','Universel']},
+    '9':{chains:[{ref:'PC-951',badge:'sram',note:'9v SRAM'},{ref:'KMC X9',badge:'kmc',note:'Compatible SRAM 9v'}],largeur:'6,5–6,8 mm ext.',cassettes:'SRAM PG · Shimano HG 9v',alerts:[],ok:['Compatible Shimano 9v']},
+    '10':{chains:[{ref:'PC-1031 / PC-1051',badge:'sram',note:'10v SRAM'},{ref:'KMC X10',badge:'kmc',note:'10v universel'}],largeur:'6,1–6,3 mm ext.',cassettes:'SRAM PG · Shimano HG 10v',alerts:[],ok:['Compatible Shimano 10v']},
+    '11':{chains:[{ref:'PC-1110 / PC-1130 / PC-1170',badge:'sram',note:'11v SRAM'},{ref:'KMC X11',badge:'kmc',note:'11v universel'}],largeur:'5,5–5,65 mm ext.',cassettes:'SRAM PG-1130 / XG-1150 · Shimano HG 11v',alerts:['⚠️ XG-1150 → freehub XD requis (10t min)'],ok:['Compatible Shimano 11v sur freehub HG (PG-1130)']},
+    '12':{chains:[{ref:'Eagle PC-1210 / PC-1230',badge:'sram',note:'12v Eagle MTB'},{ref:'PC-1270 Red AXS',badge:'sram',note:'12v Route'},{ref:'KMC e12',badge:'kmc',note:'Compatible Eagle'}],largeur:'5,2–5,3 mm ext.',cassettes:'SRAM Eagle XG-1275/1295 (XD) · Route XG-1290 (XDR)',alerts:['🚫 INCOMPATIBLE Shimano 12v','🚫 Eagle MTB : freehub XD obligatoire','🚫 Route AXS : freehub XDR ≠ XD MTB'],ok:['Cassette Eagle jusqu\'à 10t mini']},
+    '13':{chains:[{ref:'Flattop PC-1310',badge:'sram',note:'13v route AXS Force/Red'}],largeur:'4,9–5,0 mm ext.',cassettes:'SRAM XPLR XG-1350 (XDR)',alerts:['🚫 Standard propriétaire — chaîne Flattop uniquement','🚫 Freehub XDR exclusivement','🚫 Incompatible toutes autres marques'],ok:[]}
+  },
+  campa:{
+    '11':{chains:[{ref:'Campagnolo CN-11',badge:'campa',note:'11v route'},{ref:'KMC X11 (vérif.)',badge:'kmc',note:'Partiellement compatible'}],largeur:'5,5–5,6 mm ext.',cassettes:'Campagnolo 11v uniquement',alerts:['⚠️ Shimano/SRAM 11v non certifié Campagnolo'],ok:[]},
+    '12':{chains:[{ref:'Campagnolo CN-12X',badge:'campa',note:'12v Super Record/Record'}],largeur:'5,2–5,3 mm ext.',cassettes:'Campagnolo N3W 9–13v',alerts:['🚫 Corps N3W propriétaire — incompatible HG/XD/XDR'],ok:[]},
+    '13':{chains:[{ref:'Campagnolo CN-EK Ekar',badge:'campa',note:'13v gravel'}],largeur:'≈5,0 mm ext.',cassettes:'Campagnolo Ekar 13v (N3W)',alerts:['🚫 Standard exclusif — aucune alternative certifiée'],ok:[]}
+  },
+  kmc:{
+    '678':{chains:[{ref:'KMC Z7 / Z8',badge:'kmc',note:'6/7/8v universel'}],largeur:'7,1–7,3 mm',cassettes:'Toutes marques',alerts:[],ok:['Universel HG/PG']},
+    '9':{chains:[{ref:'KMC X9 / X9SL',badge:'kmc',note:'9v haute perf.'}],largeur:'6,5–6,8 mm',cassettes:'Shimano HG · SRAM PG',alerts:[],ok:['Compatible Shimano et SRAM 9v']},
+    '10':{chains:[{ref:'KMC X10 / DLC10',badge:'kmc',note:'10v'}],largeur:'6,1–6,3 mm',cassettes:'Shimano HG · SRAM PG',alerts:[],ok:['Compatible Shimano et SRAM 10v']},
+    '11':{chains:[{ref:'KMC X11 / X11SL / DLC11',badge:'kmc',note:'11v haute perf.'}],largeur:'5,5–5,65 mm',cassettes:'Shimano HG · SRAM PG/XG',alerts:['⚠️ Campagnolo : vérifier certification'],ok:['Compatible Shimano et SRAM 11v']},
+    '12':{chains:[{ref:'KMC e12 / DLC12',badge:'kmc',note:'vérifier version Shimano vs Eagle'}],largeur:'5,2–5,3 mm',cassettes:'Shimano 12v OU Eagle — selon version',alerts:['⚠️ e12 Shimano ≠ e12 Eagle — vérifier la version'],ok:[]}
+  },
+  connex:{
+    '9':{chains:[{ref:'Connex 9s0',badge:'connex',note:'9v maillon breveté'}],largeur:'6,5 mm',cassettes:'Shimano HG · SRAM PG',alerts:[],ok:['Maillon rapide sans outil']},
+    '10':{chains:[{ref:'Connex 10s0',badge:'connex',note:'10v'}],largeur:'6,1 mm',cassettes:'Shimano/SRAM 10v',alerts:[],ok:['Maillon breveté réutilisable']},
+    '11':{chains:[{ref:'Connex 11s0 / 11sE',badge:'connex',note:'11v'}],largeur:'5,5 mm',cassettes:'Shimano HG · SRAM PG',alerts:[],ok:['Maillon rapide breveté sans outil']},
+    '12':{chains:[{ref:'Connex 12s0',badge:'connex',note:'12v'}],largeur:'5,2 mm',cassettes:'Vérifier selon groupe',alerts:['⚠️ Vérifier compatibilité selon cassette'],ok:[]}
+  }
+};
+
+let cmpState = {marq:null,vit:null};
+
+function cmpPick(field,val,el){
+  cmpState[field]=val;
+  el.closest('.compat-chip-row').querySelectorAll('.compat-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function cmpCompute(){
+  const {marq,vit}=cmpState;
+  if(!marq||!vit){showToast('Sélectionnez fabricant + vitesses',true);return;}
+  const brand=CMP_DATA[marq];
+  const data=brand&&brand[vit];
+  const resEl=document.getElementById('cmpResult');
+  resEl.classList.add('show');
+  if(!data){
+    document.getElementById('cmpChainList').innerHTML='<div class="compat-alert">❌ Combinaison non répertoriée</div>';
+    document.getElementById('cmpAlerts').innerHTML='';
+    document.getElementById('cmpLargeur').innerHTML='';
+    return;
+  }
+  document.getElementById('cmpChainList').innerHTML=data.chains.map(c=>`
+    <div class="compat-chain-item">
+      <span class="cc-badge ${c.badge}">${c.badge.toUpperCase()}</span>
+      <div><div style="font-weight:600;color:var(--text)">${c.ref}</div><div style="font-size:11px;color:var(--text2);margin-top:2px">${c.note}</div></div>
+    </div>`).join('');
+  document.getElementById('cmpAlerts').innerHTML=
+    data.alerts.map(a=>`<div class="compat-alert">${a}</div>`).join('')+
+    data.ok.map(o=>`<div class="compat-ok">✓ ${o}</div>`).join('');
+  document.getElementById('cmpLargeur').innerHTML=`
+    <div class="compat-chain-item"><span class="cc-badge shimano">LARGEUR</span><div style="font-weight:600;color:var(--text)">${data.largeur}</div></div>
+    <div class="compat-chain-item"><span class="cc-badge kmc">CASSETTES</span><div style="font-size:13px;color:var(--text2)">${data.cassettes}</div></div>`;
+  resEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+// ══════════════════════════════════════════
+// GLOSSAIRE TECHNIQUE
+// ══════════════════════════════════════════
+const GLOSSARY=[
+  {term:'Axe traversant',en:'Thru-axle',tag:'std',def:'Axe plein fileté (M12 ou M15) vissé dans les pattes. Plus rigide que QR. <code>12×100 av · 12×142 · 12×148 Boost ar</code>.<span class="see-also">→ voir : OLD, Boost</span>'},
+  {term:'Araignée',en:'Spider',tag:'fr',def:'Corps du pédalier portant les plateaux. 4 ou 5 bras. Le <strong>BCD</strong> se mesure sur l\'araignée. Sans araignée = Direct Mount.'},
+  {term:'BCD',en:'Bolt Circle Diameter',tag:'std',def:'Diamètre du cercle de perçage des plateaux. <code>104mm</code> VTT · <code>110mm</code> route compact · <code>130mm</code> route std. Mesurer centre-à-centre entre 2 vis.'},
+  {term:'Boîtier pédalier',en:'Bottom Bracket (BB)',tag:'std',def:'Roulements logés dans le tube de pédalier. Standards : <strong>BSA</strong> fileté · <strong>PF30</strong> · <strong>BB86</strong> · <strong>T47</strong>. Ø intérieur + largeur définissent le standard.'},
+  {term:'Boost',en:'Boost spacing',tag:'std',def:'Standard d\'espacement moyeu Trek 2015. Avant <code>12×110mm</code> · Arrière <code>12×148mm</code>. Améliore l\'angle des rayons et la rigidité latérale.'},
+  {term:'BSD',en:'Bead Seat Diameter',tag:'std',def:'Diamètre siège de tringle ETRTO. <code>622</code>=700C/29" · <code>584</code>=27,5" · <code>559</code>=26" · <code>406</code>=20". Indépendant de la largeur du pneu.'},
+  {term:'BSA',en:'British Standard Threaded BB',tag:'std',def:'Boîtier pédalier fileté anglais. <code>34,8mm · 68mm · 1,37"×24tpi</code>. Côté droit fileté à gauche. Standard le plus répandu.'},
+  {term:'Cassette',en:'Cassette',tag:'fr',def:'Ensemble de pignons montés sur le corps de freehub. 6 à 13 vitesses selon marque. Nécessite un corps freehub compatible.'},
+  {term:'Center Lock',en:'Center Lock',tag:'std',def:'Fixation rotor Shimano par cannelures centrales + bague <code>40 Nm</code>. Adaptatear 6T→CL disponibles.'},
+  {term:'Cintre',en:'Handlebar',tag:'fr',def:'Guidon. Ø central de serrage : <code>22,2 · 25,4 · 31,8 · 35mm</code>. Doit correspondre au collier de la potence.'},
+  {term:'Développement',en:'Gear development',tag:'fr',def:'Distance parcourue par tour de pédale (mètres). Formule : <code>(plateau÷pignon) × circonférence roue</code>.'},
+  {term:'Direct Mount',en:'Direct Mount chainring',tag:'std',def:'Plateau vissé directement sur le bras de manivelle, sans araignée. Propriétaire par marque : SRAM DM ≠ Shimano HT2.'},
+  {term:'Dropper post',en:'Dropper seatpost',tag:'std',def:'Tige de selle télescopique télécommandée. Ø : <code>27,2 · 30,9 · 31,6 · 34,9mm</code>. Commande par câble ou électronique.'},
+  {term:'ERD',en:'Effective Rim Diameter',tag:'std',def:'Diamètre efficace de jante — là où les têtes de rayons se posent. Toujours < BSD (de 10–20mm). Indispensable pour calculer la longueur des rayons.'},
+  {term:'ETRTO',en:'ETRTO tire code',tag:'std',def:'Code international pneu/jante : <code>largeur-BSD</code> (ex <code>37-622</code>). Élimine les confusions pouces. 700C et 29" = même BSD 622.'},
+  {term:'Flat Mount',en:'Flat Mount',tag:'std',def:'Fixation d\'étrier frein plat par dessous. Standard route/gravel depuis 2015. Vis M5 · <code>6–8 Nm</code>.'},
+  {term:'Freehub',en:'Freehub body',tag:'std',def:'Corps de roue libre sur le moyeu. Standards : <strong>HG</strong> (Shimano ≤11v) · <strong>Micro Spline</strong> (Shimano 12v MTB) · <strong>XD</strong> (SRAM Eagle) · <strong>XDR</strong> (SRAM route) · <strong>N3W</strong> (Campagnolo).'},
+  {term:'Graisse cuivrée',en:'Copper anti-seize',tag:'fr',def:'Anti-grippage cuivre. Zones inox, titane, très exposées. Réduit le couple effectif de 10–20%.'},
+  {term:'HG / Hyperglide',en:'HyperGlide',tag:'std',def:'Standard cassette/chaîne Shimano ≤11v. Corps freehub à splines. Compatible SRAM ≤11v. Abandonné en 12v MTB (→ Micro Spline).'},
+  {term:'IS / International Standard',en:'IS brake mount',tag:'std',def:'Fixation étrier frein à vis horizontales. Standard VTT original. Adaptateurs obligatoires pour changer taille rotor.'},
+  {term:'Jeu de direction',en:'Headset',tag:'fr',def:'Roulements cadre↔fourche. Code SHIS : <code>TYPE+Ø_haut/TYPE+Ø_bas</code>. Types : EC · ZS · IS. Haut et bas peuvent être différents.'},
+  {term:'Lockring',en:'Lockring',tag:'std',def:'Bague de verrouillage cassette sur freehub. <code>40 Nm</code> outil cassette + maintien.'},
+  {term:'Micro Spline',en:'Micro Spline',tag:'std',def:'Corps freehub Shimano 12v MTB. Incompatible HG. Pignon mini 10t. Introduit avec XT M8100.'},
+  {term:'Moyeu',en:'Hub',tag:'fr',def:'Centre de la roue, roulements et freehub. Paramètres : OLD (largeur), PCD des flancs, nombre de trous.'},
+  {term:'N3W',en:'N3W (Campagnolo)',tag:'std',def:'Corps freehub Campagnolo nouvelle génération. Cassettes 9–13v. Incompatible HG/XD/XDR.'},
+  {term:'OLD',en:'Over Locknut Dimension',tag:'std',def:'Largeur totale moyeu face ext. écrou → face ext. écrou. Doit correspondre à l\'espacement pattes cadre. <code>100·110·130·142·148·157mm</code>.'},
+  {term:'OSB',en:'Rim offset',tag:'std',def:'Décalage du lit de rayon par rapport au plan médian de jante. 0 = symétrique. Positif = jante asymétrique (compense la cassette).'},
+  {term:'PCD',en:'Pitch Circle Diameter',tag:'std',def:'Diamètre du cercle de perçage des flancs de moyeu. Mesuré centre-à-centre entre 2 trous opposés. Utilisé dans le calcul de longueur de rayons.'},
+  {term:'PF30',en:'PF30 Press-Fit BB',tag:'std',def:'Boîtier emboîté. <code>Ø46mm · 68mm large</code>. Axe 30mm. Sujet aux craquements → insert T47 recommandé.'},
+  {term:'Pâte carbone',en:'Carbon friction paste',tag:'fr',def:'Pâte abrasive fine pour fixations carbone. Augmente l\'adhérence → couple réduit de 30–40%. Indispensable sur carbone.'},
+  {term:'Post Mount',en:'Post Mount',tag:'std',def:'Fixation étrier frein à 2 pattes verticales. Le plus courant VTT. Rotor natif 160mm, adaptateurs pour autres tailles.'},
+  {term:'QR',en:'Quick Release',tag:'std',def:'Serrage rapide excentrique. Axe creux 9mm (av) ou 10mm (ar). OLD : <code>100mm</code> av · <code>130/135mm</code> ar.'},
+  {term:'Rayon',en:'Spoke',tag:'fr',def:'Fil de tension moyeu→jante. Longueur dépend de ERD, PCD, distances flancs, croisements. Matériaux : inox butted · alu · carbone.'},
+  {term:'Rotor',en:'Brake rotor',tag:'fr',def:'Disque de frein acier inox. <code>140·160·180·200·203mm</code>. Fixation 6 trous Torx T25 ou Center Lock.'},
+  {term:'SHIS',en:'Standardized Headset ID System',tag:'std',def:'Codification jeux de direction. Format : <code>TYPE+Ø | Ø_colonne</code>. Ex : <code>ZS44/28.6 — EC34/28.6</code>.'},
+  {term:'T47',en:'T47 Bottom Bracket',tag:'std',def:'Boîtier fileté nouvelle génération. <code>Ø47mm fileté M47×1mm</code>. Combine grand Ø PF + fiabilité BSA fileté.'},
+  {term:'Tapered',en:'Tapered fork/headtube',tag:'std',def:'Colonne conique <code>Ø28,6mm</code> haut → <code>Ø38,1mm</code> bas. Plus rigide sans alourdir la potence. JDD tapered spécifique requis.'},
+  {term:'Tension rayon',en:'Spoke tension',tag:'fr',def:'Force de traction d\'un rayon. Cible : <code>80–120 kgf</code> route/gravel · <code>70–110 kgf</code> VTT. Mesure : tensiomètre Park Tool TM-1.'},
+  {term:'Tubeless',en:'Tubeless',tag:'std',def:'Montage sans chambre à air. Requis : jante TLR étanche, pneu tubeless, valve étanche, liquide préventif. Pression réduite, anti-crevaison.'},
+  {term:'Vitesse / Braquet',en:'Gear ratio',tag:'fr',def:'Braquet = plateau÷pignon. Développement (m/tour) = braquet × circonférence. Plus grand = plus rapide mais plus dur.'},
+  {term:'XD Driver',en:'XD Driver',tag:'std',def:'Corps freehub SRAM Eagle 12v MTB. Filetage ext. → 10t mini. Incompatible HG/XDR/Micro Spline.'},
+  {term:'XDR',en:'XDR Freehub',tag:'std',def:'Version route du XD SRAM (2mm plus long). Cassettes SRAM eTap AXS 12v. Incompatible XD/HG/Micro Spline.'},
+  {term:'ZS / Zero Stack',en:'Zero Stack Headset',tag:'std',def:'JDD à coupelle dans un lamage — affleure le tube. Le plus courant : <code>ZS44/28.6</code>. Aspect intégré sans l\'être.'},
+];
+
+let glosFiltered=[...GLOSSARY];
+
+function glosInit(){
+  const bar=document.getElementById('glosLetterBar');
+  if(!bar) return;
+  const letters=[...new Set(GLOSSARY.map(e=>e.term[0].toUpperCase()))].sort();
+  bar.innerHTML=letters.map(l=>`<button class="glos-letter-btn" onclick="glosJump('${l}')">${l}</button>`).join('');
+  glosRender(GLOSSARY);
+}
+
+function glosFilter(){
+  const q=(document.getElementById('glosSearch')?.value||'').toLowerCase();
+  glosFiltered=q?GLOSSARY.filter(e=>e.term.toLowerCase().includes(q)||e.en.toLowerCase().includes(q)||e.def.toLowerCase().includes(q)):[...GLOSSARY];
+  glosRender(glosFiltered);
+}
+
+function glosJump(letter){
+  document.getElementById('glosSearch').value='';
+  glosFiltered=[...GLOSSARY];
+  glosRender(glosFiltered);
+  setTimeout(()=>{const el=document.getElementById('glos-'+letter);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});},80);
+}
+
+function glosRender(entries){
+  const container=document.getElementById('glosContent');
+  if(!container) return;
+  if(!entries.length){container.innerHTML='<div class="glos-empty">🔍 Aucun terme trouvé</div>';return;}
+  const groups={};
+  entries.forEach(e=>{const l=e.term[0].toUpperCase();if(!groups[l])groups[l]=[];groups[l].push(e);});
+  container.innerHTML=Object.keys(groups).sort().map(letter=>`
+    <div class="glos-section">
+      <div class="glos-letter-hdr" id="glos-${letter}">${letter}</div>
+      ${groups[letter].map((e,i)=>`
+        <div class="glos-entry">
+          <div class="glos-entry-hdr" onclick="glosToggle(this)">
+            <div class="glos-term">${e.term}</div>
+            <span class="glos-tag ${e.tag}">${e.tag==='std'?'STD':e.tag.toUpperCase()}</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);flex:1;text-align:right;padding-right:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.en}</span>
+            <div class="glos-arr">›</div>
+          </div>
+          <div class="glos-def">${e.def}</div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+
+function glosToggle(hdr){
+  const def=hdr.nextElementSibling;
+  const arr=hdr.querySelector('.glos-arr');
+  if(!def) return;
+  const open=def.classList.contains('open');
+  def.classList.toggle('open',!open);
+  if(arr)arr.classList.toggle('open',!open);
+}
+
+// Init on load
+document.addEventListener('DOMContentLoaded',()=>{
+  glosInit();
+});
+</script>
+
 </html>
