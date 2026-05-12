@@ -1,0 +1,265 @@
+{
+  "brand": "Shimano",
+  "version": "0.1",
+  "derailleurs": [
+    {
+      "ref": "RD-R7000-GS",
+      "name": "105 R7000 GS",
+      "family": "105",
+      "category": "route",
+      "speeds": 11,
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 39,
+      "cablePull": "shimano_road_11",
+      "chainType": "HG-11"
+    },
+    {
+      "ref": "RD-R7000-SS",
+      "name": "105 R7000 SS",
+      "family": "105",
+      "category": "route",
+      "speeds": 11,
+      "maxSprocket": 30,
+      "minSprocket": 11,
+      "capacity": 35,
+      "cablePull": "shimano_road_11",
+      "chainType": "HG-11"
+    },
+    {
+      "ref": "RD-R8000-GS",
+      "name": "Ultegra R8000 GS",
+      "family": "Ultegra",
+      "category": "route",
+      "speeds": 11,
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 39,
+      "cablePull": "shimano_road_11",
+      "chainType": "HG-11"
+    },
+    {
+      "ref": "RD-RX400",
+      "name": "GRX RX400 10v",
+      "family": "GRX",
+      "category": "gravel",
+      "speeds": 10,
+      "maxSprocket": 36,
+      "minSprocket": 11,
+      "capacity": 41,
+      "cablePull": "shimano_tiagra_4700_grx400",
+      "chainType": "HG-X 10"
+    },
+    {
+      "ref": "RD-RX810",
+      "name": "GRX RX810 11v",
+      "family": "GRX",
+      "category": "gravel",
+      "speeds": 11,
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 40,
+      "cablePull": "shimano_road_11",
+      "chainType": "HG-11"
+    },
+    {
+      "ref": "RD-RX812",
+      "name": "GRX RX812 11v 1x",
+      "family": "GRX",
+      "category": "gravel",
+      "speeds": 11,
+      "maxSprocket": 42,
+      "minSprocket": 11,
+      "capacity": 31,
+      "cablePull": "shimano_road_11",
+      "chainType": "HG-11"
+    },
+    {
+      "ref": "RD-M591",
+      "name": "Deore M591 9v SGS",
+      "family": "Deore",
+      "category": "mtb",
+      "speeds": 9,
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 45,
+      "cablePull": "shimano_mtb_9",
+      "chainType": "HG 9"
+    },
+    {
+      "ref": "RD-M3100-SGS",
+      "name": "Alivio M3100 9v SGS",
+      "family": "Alivio",
+      "category": "mtb",
+      "speeds": 9,
+      "maxSprocket": 36,
+      "minSprocket": 11,
+      "capacity": 45,
+      "cablePull": "shimano_mtb_9",
+      "chainType": "HG 9"
+    },
+    {
+      "ref": "RD-M310",
+      "name": "Altus M310 7/8v",
+      "family": "Altus",
+      "category": "mtb",
+      "speeds": 8,
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 43,
+      "cablePull": "shimano_mtb_7_8",
+      "chainType": "HG 6/7/8"
+    }
+  ],
+  "shifters": [
+    {
+      "ref": "ST-R7000",
+      "name": "105 R7000 STI",
+      "category": "route",
+      "speeds": 11,
+      "cablePull": "shimano_road_11",
+      "brakeType": "road"
+    },
+    {
+      "ref": "ST-R8000",
+      "name": "Ultegra R8000 STI",
+      "category": "route",
+      "speeds": 11,
+      "cablePull": "shimano_road_11",
+      "brakeType": "road"
+    },
+    {
+      "ref": "ST-RX400",
+      "name": "GRX RX400 STI",
+      "category": "gravel",
+      "speeds": 10,
+      "cablePull": "shimano_tiagra_4700_grx400",
+      "brakeType": "road"
+    },
+    {
+      "ref": "ST-RX600",
+      "name": "GRX RX600 STI",
+      "category": "gravel",
+      "speeds": 11,
+      "cablePull": "shimano_road_11",
+      "brakeType": "road"
+    },
+    {
+      "ref": "ST-M510",
+      "name": "Deore ST-M510",
+      "category": "mtb",
+      "speeds": 9,
+      "cablePull": "shimano_mtb_9",
+      "brakeType": "vbrake"
+    },
+    {
+      "ref": "SL-M315",
+      "name": "Altus SL-M315",
+      "category": "mtb",
+      "speeds": 8,
+      "cablePull": "shimano_mtb_7_8",
+      "brakeType": "flatbar"
+    }
+  ],
+  "chains": [
+    {
+      "ref": "CN-HG601",
+      "name": "Shimano HG601 11v",
+      "speeds": 11,
+      "type": "HG-11"
+    },
+    {
+      "ref": "CN-HG701",
+      "name": "Shimano HG701 11v",
+      "speeds": 11,
+      "type": "HG-11"
+    },
+    {
+      "ref": "CN-HG54",
+      "name": "Shimano HG54 10v",
+      "speeds": 10,
+      "type": "HG-X 10"
+    },
+    {
+      "ref": "CN-HG53",
+      "name": "Shimano HG53 9v",
+      "speeds": 9,
+      "type": "HG 9"
+    },
+    {
+      "ref": "CN-HG40",
+      "name": "Shimano HG40 6/7/8v",
+      "speeds": 8,
+      "type": "HG 6/7/8"
+    }
+  ],
+  "cassettes": [
+    {
+      "ref": "CS-HG700 11-34",
+      "name": "105 HG700 11-34",
+      "speeds": 11,
+      "range": "11-34",
+      "largest": 34,
+      "smallest": 11,
+      "freehub": "HG",
+      "chainType": "HG-11"
+    },
+    {
+      "ref": "CS-R7000 11-32",
+      "name": "105 R7000 11-32",
+      "speeds": 11,
+      "range": "11-32",
+      "largest": 32,
+      "smallest": 11,
+      "freehub": "HG",
+      "chainType": "HG-11"
+    },
+    {
+      "ref": "CS-HG500 11-34",
+      "name": "HG500 10v 11-34",
+      "speeds": 10,
+      "range": "11-34",
+      "largest": 34,
+      "smallest": 11,
+      "freehub": "HG",
+      "chainType": "HG-X 10"
+    },
+    {
+      "ref": "CS-HG400 11-36",
+      "name": "HG400 9v 11-36",
+      "speeds": 9,
+      "range": "11-36",
+      "largest": 36,
+      "smallest": 11,
+      "freehub": "HG",
+      "chainType": "HG 9"
+    }
+  ],
+  "freehubRules": [
+    {
+      "freehub": "HG",
+      "compatibleWith": [
+        "Shimano HG 8/9/10/11 route-gravel",
+        "SRAM PG 8/9/10/11"
+      ]
+    },
+    {
+      "freehub": "Microspline",
+      "compatibleWith": [
+        "Shimano MTB 12v 10T"
+      ]
+    },
+    {
+      "freehub": "XD",
+      "compatibleWith": [
+        "SRAM Eagle / 10T MTB"
+      ]
+    },
+    {
+      "freehub": "XDR",
+      "compatibleWith": [
+        "SRAM AXS route/gravel 12v"
+      ]
+    }
+  ]
+}
