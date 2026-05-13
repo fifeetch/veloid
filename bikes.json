@@ -1,0 +1,22 @@
+{
+  "models": [
+    {
+      "brand": "Genesis",
+      "model": "Croix de Fer 20",
+      "year": "2024",
+      "bb": "BSA 68",
+      "headset": "SHIS à vérifier selon taille/fourche",
+      "axles": "QR selon montage origine / vérifier moyeux",
+      "notes": "Fiche exemple à compléter par données constructeur."
+    },
+    {
+      "brand": "Cannondale",
+      "model": "Trail",
+      "year": "2020-2025",
+      "bb": "BSA/PF selon millésime",
+      "headset": "Semi-intégré selon millésime",
+      "axles": "QR ou Boost selon version",
+      "notes": "Vérifier modèle exact."
+    }
+  ]
+}

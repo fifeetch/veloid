@@ -11763,5 +11763,313 @@ function devisSetStatus(st){ devisStatus=st; if(st==='accepté' && !sigData('dev
 })();
 </script>
 
-<script src="js/compatibility-engine.js?v=0.9.08"></script>
+
+
+<!-- ══════════════════════════════════════════
+     VÉLOID V0.9.09 — Correctif diagnostics + photos
+     - compression photos avant stockage
+     - sauvegarde diagnostics contrôlée
+     - erreur visible si localStorage plein
+     - restauration des photos sauvegardées
+     ══════════════════════════════════════════ -->
+<script>
+(function(){
+  const DIAG_VERSION = '0.9.09';
+  const MAX_PHOTO_DIM = 1280;
+  const PHOTO_QUALITY = 0.72;
+  const MAX_PHOTOS_PER_POINT = 8;
+
+  function safeToast(msg, err){
+    try{ if(typeof showToast === 'function') showToast(msg, !!err); else alert(msg); }
+    catch(e){ console.log(msg); }
+  }
+  function escHtml(s){
+    if(typeof histEsc === 'function') return histEsc(s);
+    return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+  function photoCount(entry){
+    let n = 0;
+    try{
+      Object.values(entry?.points || {}).forEach(p => { if(Array.isArray(p.photos)) n += p.photos.length; });
+    }catch(e){}
+    return n;
+  }
+  function cloneStateWithoutRefs(){
+    try{ return JSON.parse(JSON.stringify(window.dvState || dvState || {})); }
+    catch(e){ return Object.assign({}, window.dvState || {}); }
+  }
+  function stripPhotos(entry){
+    const clean = JSON.parse(JSON.stringify(entry));
+    Object.values(clean.points || {}).forEach(p => { p.photos = []; });
+    clean.photoSaveWarning = 'Photos retirées automatiquement : stockage local plein ou navigateur trop limité.';
+    return clean;
+  }
+  function setLocalHist(hist){
+    localStorage.setItem('veloid_hist', JSON.stringify(hist));
+  }
+  function normalizeDiagEntry(h){
+    if(!h || typeof h !== 'object') return h;
+    if(!h.id) h.id = 'diag_' + (h.ts || Date.now()) + '_' + Math.random().toString(36).slice(2,6);
+    if(!h.ts) h.ts = Date.now();
+    if(!h.updatedAt) h.updatedAt = h.savedAt || new Date(h.ts).toISOString();
+    if(!h.savedAt) h.savedAt = h.updatedAt;
+    if(!h.syncVersion) h.syncVersion = DIAG_VERSION;
+    h.photoCount = photoCount(h);
+    return h;
+  }
+  window.histLoad = function(){
+    let arr = [];
+    try{ arr = JSON.parse(localStorage.getItem('veloid_hist') || '[]'); }catch(e){ arr = []; }
+    if(!Array.isArray(arr) || !arr.length){
+      try{
+        const legacy = JSON.parse(localStorage.getItem('veloid_historique') || '[]');
+        if(Array.isArray(legacy) && legacy.length){
+          arr = legacy;
+          try{ localStorage.setItem('veloid_hist', JSON.stringify(arr.map(normalizeDiagEntry))); }catch(e){}
+        }
+      }catch(e){}
+    }
+    if(!Array.isArray(arr)) arr = [];
+    return arr.map(normalizeDiagEntry);
+  };
+
+  function fileToCompressedDataURL(file){
+    return new Promise((resolve, reject) => {
+      if(!file || !file.type || !file.type.startsWith('image/')) return reject(new Error('Fichier image invalide'));
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Lecture photo impossible'));
+      reader.onload = () => {
+        const original = reader.result;
+        const img = new Image();
+        img.onerror = () => resolve(original); // fallback compatible
+        img.onload = () => {
+          try{
+            let w = img.naturalWidth || img.width;
+            let h = img.naturalHeight || img.height;
+            const ratio = Math.min(1, MAX_PHOTO_DIM / Math.max(w, h));
+            w = Math.max(1, Math.round(w * ratio));
+            h = Math.max(1, Math.round(h * ratio));
+            const canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            const compressed = canvas.toDataURL('image/jpeg', PHOTO_QUALITY);
+            resolve(compressed || original);
+          }catch(e){ resolve(original); }
+        };
+        img.src = original;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  window.dvAddPhoto = async function(id, input){
+    try{
+      if(!input || !input.files || !input.files.length) return;
+      const file = input.files[0];
+      if(!window.dvState && typeof dvState !== 'undefined') window.dvState = dvState;
+      const state = window.dvState || dvState;
+      if(!state[id]) state[id] = { status:null, priority:null, note:'', action:'', photos:[] };
+      state[id].photos = Array.isArray(state[id].photos) ? state[id].photos : [];
+      if(state[id].photos.length >= MAX_PHOTOS_PER_POINT){ safeToast('Maximum '+MAX_PHOTOS_PER_POINT+' photos par point de contrôle', true); return; }
+      const btn = input.closest('.dv-photo-btn');
+      const oldTxt = btn ? btn.childNodes[0].textContent : '';
+      if(btn) btn.childNodes[0].textContent = '⏳ Compression photo… ';
+      const dataUrl = await fileToCompressedDataURL(file);
+      state[id].photos.push(dataUrl);
+      const prev = document.getElementById('dvPhotos'+id);
+      if(prev){
+        const wrap = document.createElement('span');
+        wrap.style.cssText = 'position:relative;display:inline-block';
+        const img = document.createElement('img');
+        img.className = 'dv-photo-thumb';
+        img.src = dataUrl;
+        img.title = 'Photo sauvegardée dans le diagnostic';
+        wrap.appendChild(img);
+        prev.appendChild(wrap);
+      }
+      if(btn) btn.childNodes[0].textContent = oldTxt || '📷 Ajouter une photo ';
+      input.value = '';
+      safeToast('✓ Photo ajoutée et compressée');
+    }catch(e){
+      console.error('[VéloID Diagnostic] Photo non enregistrée', e);
+      safeToast('Photo non enregistrée : '+(e.message || e), true);
+    }
+  };
+
+  window.histSave = function(){
+    try{
+      const state = window.dvState || dvState || {};
+      const filled = DV_POINTS.filter(p => state[p.id] && state[p.id].status !== null);
+      if(!filled.length){ safeToast('Aucun point contrôlé', true); return false; }
+      const f = typeof dvGetFiche === 'function' ? dvGetFiche() : {};
+      let penalite = 0;
+      filled.forEach(p => { penalite += DV_STATUS[state[p.id].status].score; });
+      const score = Math.max(0, Math.round(100 - (penalite / Math.max(filled.length * 80, 1)) * 100));
+      const counts = { ok:0, warn:0, fix:0, replace:0, danger:0 };
+      filled.forEach(p => { if(counts[state[p.id].status] !== undefined) counts[state[p.id].status]++; });
+      const now = new Date();
+      const points = cloneStateWithoutRefs();
+      Object.values(points || {}).forEach(p => { if(!Array.isArray(p.photos)) p.photos = []; });
+      const entry = normalizeDiagEntry({
+        id: 'diag_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+        record_id: 'diag_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+        date: now.toLocaleDateString('fr-FR'),
+        ts: now.getTime(),
+        savedAt: now.toISOString(),
+        updatedAt: now.toISOString(),
+        syncVersion: DIAG_VERSION,
+        client: { nom:f.nom, prenom:f.prenom, tel:f.tel, mail:f.mail },
+        velo: { marque:f.marque, modele:f.modele, annee:f.annee, type:f.type, couleur:f.couleur, serie:f.serie, km:f.km },
+        atelier: { meca:f.meca, atelier:f.atelier },
+        score, counts,
+        points,
+        comment: document.getElementById('dvSumComment')?.value || ''
+      });
+      const hist = window.histLoad();
+      hist.unshift(entry);
+      if(hist.length > 200) hist.length = 200;
+      try{
+        setLocalHist(hist);
+        safeToast('✓ Diagnostic sauvegardé' + (entry.photoCount ? ' · '+entry.photoCount+' photo(s)' : ''));
+      }catch(e){
+        console.warn('[VéloID Diagnostic] Stockage avec photos impossible, tentative sans photos', e);
+        const fallback = stripPhotos(entry);
+        const histFallback = [fallback].concat(hist.slice(1));
+        try{
+          setLocalHist(histFallback);
+          safeToast('Diagnostic sauvegardé sans photos : stockage local plein', true);
+        }catch(e2){
+          console.error('[VéloID Diagnostic] Sauvegarde impossible', e2);
+          safeToast('Sauvegarde impossible : stockage local plein. Exporte une sauvegarde puis supprime des anciennes photos.', true);
+          return false;
+        }
+      }
+      try{ if(typeof histRender === 'function') histRender(); }catch(e){}
+      try{ if(typeof updateDashboardStats === 'function') updateDashboardStats(); }catch(e){}
+      try{ if(typeof sbAutoSync === 'function' && window.sbUser) sbAutoSync(); }catch(e){}
+      return true;
+    }catch(e){
+      console.error('[VéloID Diagnostic] Erreur sauvegarde', e);
+      safeToast('Erreur sauvegarde diagnostic : '+(e.message || e), true);
+      return false;
+    }
+  };
+
+  window.histDelete = function(idx){
+    const hist = window.histLoad();
+    hist.splice(idx,1);
+    try{
+      localStorage.setItem('veloid_hist', JSON.stringify(hist));
+      try{ if(typeof sbAutoSync === 'function' && window.sbUser) sbAutoSync(); }catch(e){}
+    }catch(e){ console.error(e); safeToast('Suppression locale impossible', true); }
+    if(typeof histRender === 'function') histRender();
+    safeToast('Diagnostic supprimé');
+  };
+
+  window.histRestore = function(idx){
+    const hist = window.histLoad();
+    const h = hist[idx];
+    if(!h) return;
+    const set = (id,v) => { const e=document.getElementById(id); if(e) e.value = v || ''; };
+    set('dvClientNom', h.client?.nom); set('dvClientPrenom', h.client?.prenom);
+    set('dvClientTel', h.client?.tel); set('dvClientMail', h.client?.mail);
+    set('dvVeloMarque', h.velo?.marque); set('dvVeloModele', h.velo?.modele);
+    set('dvVeloAnnee', h.velo?.annee); set('dvVeloCouleur', h.velo?.couleur);
+    set('dvVeloSerie', h.velo?.serie); set('dvVeloKm', h.velo?.km);
+    set('dvMeca', h.atelier?.meca); set('dvAtelier', h.atelier?.atelier);
+    const typeEl = document.getElementById('dvVeloType'); if(typeEl) typeEl.value = h.velo?.type || '';
+    if(typeof dvInit === 'function') dvInit();
+    const state = window.dvState || dvState;
+    DV_POINTS.forEach(p => {
+      const s = h.points?.[p.id];
+      if(!s || !s.status) return;
+      state[p.id] = Object.assign({ status:null, priority:null, note:'', action:'', photos:[] }, s);
+      if(!Array.isArray(state[p.id].photos)) state[p.id].photos = [];
+      const card = document.getElementById('dvCard'+p.id);
+      if(!card) return;
+      const st = DV_STATUS[s.status];
+      card.className = 'dv-card open st-' + s.status;
+      card.querySelectorAll('.dv-st-btn').forEach(b => { b.className = 'dv-st-btn'; if((b.getAttribute('onclick')||'').includes("'"+s.status+"'")) b.classList.add(st.cls); });
+      card.querySelectorAll('.dv-prio-btn').forEach(b => { b.className = 'dv-prio-btn'; });
+      if(s.priority){ card.querySelectorAll('.dv-prio-btn').forEach(b => { if((b.getAttribute('onclick')||'').includes("'"+s.priority+"'")) b.classList.add('p-'+s.priority); }); }
+      const noteEl = document.getElementById('dvNote'+p.id); if(noteEl) noteEl.value = s.note || '';
+      const actEl = document.getElementById('dvAction'+p.id); if(actEl) actEl.value = s.action || '';
+      const prev = document.getElementById('dvPhotos'+p.id);
+      if(prev){
+        prev.innerHTML = '';
+        state[p.id].photos.forEach(src => { const img=document.createElement('img'); img.className='dv-photo-thumb'; img.src=src; img.title='Photo restaurée'; prev.appendChild(img); });
+      }
+      const badge = document.getElementById('dvBadge'+p.id);
+      if(badge){ badge.style.display='flex'; badge.style.background=st.col+'22'; badge.style.color=st.col; badge.style.border='1px solid '+st.col+'55'; badge.textContent=st.label; }
+      if(p.zone){ const m=document.getElementById(p.zone); if(m){ m.setAttribute('fill',st.col); m.setAttribute('stroke',st.col); m.setAttribute('r','10'); } const mt=document.getElementById(p.zone.replace('dvM','dvMt')); if(mt) mt.setAttribute('fill','#fff'); }
+    });
+    const cmtEl = document.getElementById('dvSumComment'); if(cmtEl) cmtEl.value = h.comment || '';
+    try{ if(typeof dvUpdateScore === 'function') dvUpdateScore(); if(typeof dvUpdateSummary === 'function') dvUpdateSummary(); }catch(e){}
+    if(typeof showScreen === 'function') showScreen('diagvelo');
+    safeToast('✓ Diagnostic restauré' + (photoCount(h) ? ' · photos incluses' : ''));
+  };
+
+  window.histRenderDiagnostics = function(){
+    const all = window.histLoad();
+    const q = typeof histGetSearch === 'function' ? histGetSearch() : '';
+    const list = all.filter(h => typeof histMatchText === 'function' ? histMatchText(h, q) : true);
+    const el = document.getElementById('histList');
+    const cnt = document.getElementById('histCount');
+    if(!el) return;
+    if(cnt) cnt.textContent = list.length + ' diagnostic(s) trouvé(s)';
+    if(!list.length){
+      el.innerHTML = '<div class="hist-empty">📋 Aucun diagnostic sauvegardé<br>Réalisez un diagnostic et appuyez sur<br><strong>💾 Sauvegarder</strong></div>';
+      return;
+    }
+    el.innerHTML = list.map(h => {
+      const idx = all.findIndex(x => String(x.id) === String(h.id));
+      const clientLine = [h.client?.prenom, h.client?.nom].filter(Boolean).join(' ') || '— Client inconnu —';
+      const veloLine = [h.velo?.marque, h.velo?.modele, h.velo?.annee].filter(Boolean).join(' ') || '— Vélo non renseigné —';
+      const scoreCol = h.score >= 80 ? '#22c55e' : h.score >= 60 ? '#f97316' : '#ef4444';
+      const pc = photoCount(h);
+      const tags = [
+        h.counts?.danger ? `<span class="hist-tag" style="background:rgba(168,85,247,.15);color:#a855f7">⚠️ ${h.counts.danger} danger</span>` : '',
+        h.counts?.replace ? `<span class="hist-tag" style="background:rgba(239,68,68,.12);color:#ef4444">🔴 ${h.counts.replace} remplacer</span>` : '',
+        h.counts?.fix ? `<span class="hist-tag" style="background:rgba(249,115,22,.12);color:#f97316">🔧 ${h.counts.fix} régler</span>` : '',
+        h.counts?.ok ? `<span class="hist-tag" style="background:rgba(34,197,94,.12);color:#22c55e">✓ ${h.counts.ok} OK</span>` : '',
+        pc ? `<span class="hist-tag" style="background:rgba(45,127,249,.14);color:#60a5fa">📷 ${pc} photo(s)</span>` : '',
+        h.photoSaveWarning ? `<span class="hist-tag" style="background:rgba(245,158,11,.12);color:#f59e0b">Photos non stockées</span>` : ''
+      ].filter(Boolean).join('');
+      return `<div class="hist-card">
+        <div class="hist-card-hdr">
+          <div class="hist-score-dot" style="background:${scoreCol}">${escHtml(h.score)}</div>
+          <div class="hist-info">
+            <div class="hist-client">${escHtml(clientLine)}</div>
+            <div class="hist-velo">${escHtml(veloLine)}</div>
+            <div class="hist-date">${escHtml(h.date || '')}${h.atelier?.atelier ? ' · '+escHtml(h.atelier.atelier) : ''}</div>
+          </div>
+        </div>
+        <div class="hist-tags">${tags}</div>
+        <div class="hist-card-btns">
+          <button class="hist-open-btn" onclick="histRestore(${idx})">↩ Rouvrir</button>
+          <button class="hist-devis-btn" onclick="histToDevis(${idx})">€ Devis</button>
+          <button class="hist-del-btn" onclick="histDelete(${idx})">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    try{
+      const el = document.getElementById('storageInfo');
+      if(el && !document.getElementById('diagPhotoFixInfo')){
+        const div = document.createElement('div');
+        div.id = 'diagPhotoFixInfo';
+        div.style.cssText = 'margin-top:8px;font-family:JetBrains Mono,monospace;font-size:10px;color:#60a5fa;line-height:1.5';
+        div.textContent = 'Diagnostic photos · correctif V0.9.09 actif : compression + sauvegarde contrôlée';
+        el.parentNode && el.parentNode.appendChild(div);
+      }
+    }catch(e){}
+  });
+})();
+</script>
+
+<script src="js/compatibility-engine.js?v=0.9.09"></script>
 </html>
