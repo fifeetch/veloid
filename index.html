@@ -10,7 +10,7 @@
 <meta name="description" content="Application atelier vélo — diagnostic, standards, rayonnage, braquet · v0.7.0">
 
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d0d0d'/><text y='72' x='50' text-anchor='middle' font-size='60' font-family='sans-serif' font-weight='bold' fill='%23e8400c'>V</text></svg>">
-<title>VéloID V9.3 Safe Compatibilité PRO</title>
+<title>VéloID V0.9.04 Synchro intégrée</title>
 <script>
 // Init anticipé — exécuté avant le DOM pour éviter le flash de thème
 var APP_LANG = localStorage.getItem('veloid_lang') || 'fr';
@@ -8802,7 +8802,7 @@ window.addEventListener('load',()=>{
         <div id="sbLastSync" style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);display:none"></div>
 
         <!-- ── Panneau configuration URL+clé ── -->
-        <div id="sbConfigPanel" style="background:#161616;border:1px solid #e8400c44;border-radius:12px;padding:12px 14px">
+        <div id="sbConfigPanel" style="display:none;background:#161616;border:1px solid #e8400c44;border-radius:12px;padding:12px 14px">
           <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#e8400c;text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">🔧 Configuration Supabase</div>
 
           <div style="margin-bottom:8px">
@@ -10356,8 +10356,8 @@ function storageInfoRender(){
 // ══════════════════════════════════════════
 // SUPABASE — Synchro cloud · V0.9.03 robuste
 // ══════════════════════════════════════════
-const SB_URL = (localStorage.getItem('veloid_sb_url') || '').trim();
-const SB_KEY = (localStorage.getItem('veloid_sb_key') || '').trim();
+const SB_URL = 'https://appbmuawgfmfwqwsrebi.supabase.co';
+const SB_KEY = 'sb_publishable_eqzRvvHOrS5tr1Ub8ttsZw_ntizgo_P';
 const SB_TABLE = 'veloid_records';
 
 let sbClient = null;
@@ -10583,8 +10583,8 @@ function sbRefreshAppAfterSync(){
 
 // ── Initialisation Supabase ──
 function sbInit(){
-  const url = (localStorage.getItem('veloid_sb_url') || '').trim();
-  const key = (localStorage.getItem('veloid_sb_key') || '').trim();
+  const url = SB_URL;
+  const key = SB_KEY;
   if(!url || !key){ sbSetDisconnected(); return; }
   try{
     sbClient = supabase.createClient(url, key, {
@@ -10630,28 +10630,15 @@ function sbSetDisconnected(){
   if(actions)   actions.style.display   = 'none';
 }
 function sbSaveConfig(){
-  const url = (document.getElementById('sbUrlInput')?.value || '').trim();
-  const key = (document.getElementById('sbKeyInput')?.value || '').trim();
-  if(!url || !url.startsWith('https://')){ showToast('URL Supabase invalide (doit commencer par https://)', true); return; }
-  if(!key || key.length < 20){ showToast('Clé API invalide (trop courte)', true); return; }
-  try{ localStorage.setItem('veloid_sb_url', url); localStorage.setItem('veloid_sb_key', key); }
-  catch(e){ showToast('Erreur sauvegarde config', true); return; }
-  showToast('✓ Configuration sauvegardée — reconnexion…');
-  setTimeout(()=>{ sbClient = null; sbUser = null; window.sbUser=null; sbInit(); }, 600);
+  // V0.9.04 : configuration Supabase intégrée au code pour simplifier l'usage.
+  showToast('Configuration Supabase déjà intégrée. Vous pouvez vous connecter par email.');
+  setTimeout(()=>{ sbClient = null; sbUser = null; window.sbUser=null; sbInit(); }, 300);
 }
 async function sbLogin(){
   if(!sbClient){
-    const url = (localStorage.getItem('veloid_sb_url')||'').trim();
-    const key = (localStorage.getItem('veloid_sb_key')||'').trim();
-    if(!url || !key){
-      showToast('Configurez d\'abord l\'URL et la clé Supabase ci-dessous', true);
-      const cfg = document.getElementById('sbConfigPanel');
-      if(cfg) cfg.style.display = cfg.style.display === 'none' ? 'block' : 'none';
-      return;
-    }
     sbInit();
     await new Promise(r => setTimeout(r, 800));
-    if(!sbClient){ showToast('Impossible d\'initialiser Supabase', true); return; }
+    if(!sbClient){ showToast('Impossible d\'initialiser Supabase intégré', true); return; }
   }
   const email = (document.getElementById('sbEmail')?.value || '').trim();
   if(!email || !email.includes('@')){ showToast('Email invalide', true); return; }
@@ -10782,8 +10769,8 @@ async function sbRestore(){
 }
 
 function sbShowDiag(errors){
-  const url = localStorage.getItem('veloid_sb_url') || '(non définie)';
-  const keyPreview = (localStorage.getItem('veloid_sb_key')||'(non définie)').substring(0,20) + '…';
+  const url = SB_URL || '(non définie)';
+  const keyPreview = (SB_KEY || '(non définie)').substring(0,20) + '…';
   const errTxt = errors ? errors.map(e => `• clé=${e.key||'?'} · type=${e.type||'?'} · id=${e.record_id||'-'} · ${e.message||e}`).join('\n') : 'Aucun détail';
   console.group('[VéloID Sync V0.9.03] Diagnostic');
   console.log('URL projet:', url);
@@ -10809,12 +10796,14 @@ function sbPrefillConfig(){
   const urlInp = document.getElementById('sbUrlInput');
   const keyInp = document.getElementById('sbKeyInput');
   const lastSync = document.getElementById('sbLastSync');
-  if(urlInp) urlInp.value = localStorage.getItem('veloid_sb_url') || '';
-  if(keyInp) keyInp.value = localStorage.getItem('veloid_sb_key') || '';
+  if(urlInp) urlInp.value = SB_URL;
+  if(keyInp) keyInp.value = SB_KEY;
   const last = localStorage.getItem('veloid_sb_last_sync');
   if(lastSync && last){ lastSync.textContent = 'Dernière synchro : ' + new Date(last).toLocaleString('fr-FR'); lastSync.style.display = 'block'; }
   const cfg = document.getElementById('sbConfigPanel');
-  if(cfg && localStorage.getItem('veloid_sb_url') && localStorage.getItem('veloid_sb_key')) cfg.style.display = 'none';
+  if(cfg) cfg.style.display = 'none';
+  const status = document.getElementById('sbStatusBar');
+  if(status && !sbUser) status.innerHTML = 'Configuration Supabase intégrée · connectez-vous avec votre email';
 }
 
 /* ══════════════════════════════════════════
