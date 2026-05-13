@@ -10,7 +10,7 @@
 <meta name="description" content="Application atelier vélo — diagnostic, standards, rayonnage, braquet · v0.7.0">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d0d0d'/><text y='72' x='50' text-anchor='middle' font-size='60' font-family='sans-serif' font-weight='bold' fill='%23e8400c'>V</text></svg>">
-<title>VéloID 0.7.2</title>
+<title>VéloID V9.2 Compatibilité PRO</title>
 <script>
 // Init anticipé — exécuté avant le DOM pour éviter le flash de thème
 var APP_LANG = localStorage.getItem('veloid_lang') || 'fr';
@@ -1293,45 +1293,6 @@ body.light-mode .depot-hero{background:linear-gradient(135deg,rgba(232,64,12,.12
   #diag .diag-intro-schema.open{max-height:34vh}
   #diag .diag-intro-schema svg{max-height:32vh}
 }
-
-
-/* ══ V9 — ASSISTANT COMPATIBILITÉ PRO ══ */
-.compat-pro-hero{border-radius:24px;padding:17px;margin-bottom:14px;background:linear-gradient(135deg,rgba(45,127,249,.18),rgba(245,158,11,.12));border:1px solid rgba(255,255,255,.09);position:relative;overflow:hidden}
-.compat-pro-kicker{font-family:'JetBrains Mono',monospace;font-size:10px;color:#60a5fa;letter-spacing:.16em;text-transform:uppercase}
-.compat-pro-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-top:4px}
-.compat-pro-sub{font-size:12px;color:var(--text2);line-height:1.55;margin-top:5px}
-.compat-pro-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
-.compat-pro-tab{min-height:42px;border-radius:12px;border:1.5px solid var(--border2);background:var(--card);color:var(--text2);font-family:'Syne',sans-serif;font-size:11px;font-weight:800;cursor:pointer;padding:6px}
-.compat-pro-tab.active{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:0 8px 18px rgba(45,127,249,.22)}
-.compat-pro-panel{display:none}
-.compat-pro-panel.active{display:block}
-.compat-pro-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:13px;margin-bottom:10px}
-.compat-pro-title-sm{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--text);margin-bottom:9px;display:flex;align-items:center;gap:8px}
-.compat-pro-title-sm:after{content:'';height:1px;background:var(--border2);flex:1}
-.compat-pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.compat-pro-field{margin-bottom:10px}
-.compat-pro-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
-.compat-pro-inp,.compat-pro-select{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none}
-.compat-pro-inp.mono{font-family:'JetBrains Mono',monospace;text-transform:uppercase}
-.compat-pro-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.compat-pro-btn{height:42px;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:#fff;background:var(--blue)}
-.compat-pro-btn.gray{background:var(--card2);color:var(--text2);border:1px solid var(--border2)}
-.compat-pro-result{display:none;background:var(--card);border:2px solid var(--blue);border-radius:16px;padding:14px;margin-top:12px}
-.compat-pro-result.show{display:block}
-.compat-pro-status{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px}
-.compat-pro-status.ok{color:#22c55e}.compat-pro-status.warn{color:#f59e0b}.compat-pro-status.ko{color:#ef4444}
-.compat-pro-list{display:flex;flex-direction:column;gap:7px;margin-top:10px}
-.compat-pro-line{background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:9px 11px;font-size:12px;color:var(--text2);line-height:1.45}
-.compat-pro-line strong{color:var(--text)}
-.compat-pro-line.ok{border-color:rgba(34,197,94,.25);background:rgba(34,197,94,.08);color:#22c55e}
-.compat-pro-line.warn{border-color:rgba(245,158,11,.25);background:rgba(245,158,11,.08);color:#f59e0b}
-.compat-pro-line.ko{border-color:rgba(239,68,68,.25);background:rgba(239,68,68,.08);color:#f87171}
-.compat-pro-db-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px}
-.compat-pro-bike-card{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:12px;margin-top:10px}
-.compat-pro-bike-head{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text)}
-.compat-pro-bike-meta{font-size:12px;color:var(--text2);margin-top:3px}
-@media(max-width:520px){.compat-pro-tabs{grid-template-columns:1fr 1fr}.compat-pro-grid,.compat-pro-actions{grid-template-columns:1fr}}
-body.light-mode .compat-pro-hero{background:linear-gradient(135deg,rgba(45,127,249,.12),rgba(245,158,11,.10));border-color:rgba(0,0,0,.08)}
 
 </style>
 </head>
@@ -7229,7 +7190,7 @@ function buildDiagEmailHtml(f, score, scoreCol, counts, comment){
   </body>
 
 
-
+<script src="js/compatibility-engine.js"></script>
 </html>`;
 }
 
@@ -7312,8 +7273,7 @@ function buildDevisEmailHtml(clientName, lines, ht, tva, ttc, tvaRate, note){
     </td></tr>
   </table>
   </td></tr></table>
-  </body>
-</html>`;
+  </body></html>`;
 }
 
 // ── Mise à jour devisEmail pour envoyer HTML ──
@@ -8480,94 +8440,68 @@ window.addEventListener('load',()=>{
 <!-- Toast global -->
 <div class="velo-toast" id="veloToast"></div>
 
-
-<!-- ══ V9 — ASSISTANT COMPATIBILITÉ PRO ══ -->
+<!-- ══ COMPATIBILITÉ CHAÎNE/CASSETTE ══ -->
 <div class="screen" id="compat">
   <div class="diag-hdr">
     <div class="btn-back" onclick="goHome()">‹</div>
     <div class="dh-info">
-      <div class="dh-title">Assistant Compatibilité PRO</div>
-      <div class="dh-step">Transmission · freins · standards · recherche vélo</div>
+      <div class="dh-title">Compatibilités vélo</div>
+      <div class="dh-step">Transmission · freins · roues · pneus · standards</div>
     </div>
   </div>
   <div class="compat-scroll">
-    <div class="compat-pro-hero">
-      <div class="compat-pro-kicker">Atelier PRO</div>
-      <div class="compat-pro-title">Compatibilité mécanique</div>
-      <div class="compat-pro-sub">Contrôle atelier avec base JSON externe : Shimano, SRAM, freinage, standards et fiches vélo. Le résultat donne compatible, sous conditions ou incompatible avec explication technique.</div>
+    <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;padding:11px 14px;margin-bottom:14px;font-size:12px;color:#22c55e;line-height:1.6">
+      🔗 Module compatibilité élargi : transmission maintenant, puis aide atelier pour freins, roues, pneus et standards. Sélectionnez une famille puis les critères utiles.
     </div>
-
-    <div class="compat-pro-tabs">
-      <button class="compat-pro-tab active" onclick="compatProTab('transmission',this)">Transmission</button>
-      <button class="compat-pro-tab" onclick="compatProTab('freinage',this)">Freinage</button>
-      <button class="compat-pro-tab" onclick="compatProTab('standards',this)">Standards</button>
-      <button class="compat-pro-tab" onclick="compatProTab('velo',this)">Recherche vélo</button>
+    <div class="compat-section">
+      <div class="compat-section-hdr"><span class="compat-section-hdr-title">Famille de compatibilité</span></div>
+      <div class="compat-section-body">
+        <div class="compat-chip-row" id="cmp_family">
+          <div class="compat-chip sel" onclick="cmpFamily('transmission',this)">Transmission</div>
+          <div class="compat-chip" onclick="cmpFamily('freins',this)">Freins</div>
+          <div class="compat-chip" onclick="cmpFamily('roues',this)">Roues / moyeux</div>
+          <div class="compat-chip" onclick="cmpFamily('pneus',this)">Pneus / jantes</div>
+          <div class="compat-chip" onclick="cmpFamily('cockpit',this)">Cockpit / standards</div>
+        </div>
+        <div id="cmpFamilyInfo" class="compat-ok">✓ Transmission : chaîne, cassette, largeur, alertes croisées Shimano / SRAM / Campagnolo / KMC / Connex.</div>
+      </div>
     </div>
-
-    <section class="compat-pro-panel active" id="compatPanelTransmission">
-      <div class="compat-pro-card">
-        <div class="compat-pro-title-sm">Transmission PRO</div>
-        <div class="compat-pro-grid">
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Marque principale</div><select class="compat-pro-select" id="cpBrand"><option value="shimano">Shimano</option><option value="sram">SRAM</option></select></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Corps roue libre</div><select class="compat-pro-select" id="cpFreehub"><option>HG</option><option>Microspline</option><option>XD</option><option>XDR</option><option>N3W</option></select></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Shifter / commande</div><input class="compat-pro-inp mono" id="cpShifter" placeholder="ex : ST-R7000"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Dérailleur arrière</div><input class="compat-pro-inp mono" id="cpRearDerailleur" placeholder="ex : RD-R7000-GS"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Cassette</div><input class="compat-pro-inp mono" id="cpCassette" placeholder="ex : CS-HG700 11-34"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Chaîne</div><input class="compat-pro-inp mono" id="cpChain" placeholder="ex : CN-HG601"></div>
-        </div>
-        <div class="compat-pro-actions"><button class="compat-pro-btn" onclick="compatRunTransmission()">Analyser</button><button class="compat-pro-btn gray" onclick="compatFillDemo('transmission')">Exemple atelier</button></div>
-        <div class="compat-pro-db-note" id="compatDbStatus">Chargement base compatibilité…</div>
+    <div class="compat-section">
+      <div class="compat-section-hdr">
+        <span class="compat-section-hdr-title">Configuration transmission</span>
       </div>
-      <div class="compat-pro-result" id="compatTransmissionResult"></div>
-    </section>
-
-    <section class="compat-pro-panel" id="compatPanelFreinage">
-      <div class="compat-pro-card">
-        <div class="compat-pro-title-sm">Freinage PRO</div>
-        <div class="compat-pro-grid">
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Levier</div><input class="compat-pro-inp mono" id="cpBrakeLever" placeholder="ex : ST-RX400"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Étrier</div><input class="compat-pro-inp mono" id="cpBrakeCaliper" placeholder="ex : BR-RX400"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Rotor</div><select class="compat-pro-select" id="cpRotor"><option>140</option><option selected>160</option><option>180</option><option>203</option></select></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Fixation cadre/fourche</div><select class="compat-pro-select" id="cpBrakeMount"><option>Flat mount</option><option>Post mount</option><option>IS</option></select></div>
+      <div class="compat-section-body">
+        <div class="compat-field-lbl">Fabricant</div>
+        <div class="compat-chip-row" id="cmp_marq">
+          <div class="compat-chip" onclick="cmpPick('marq','shimano',this)">Shimano</div>
+          <div class="compat-chip" onclick="cmpPick('marq','sram',this)">SRAM</div>
+          <div class="compat-chip" onclick="cmpPick('marq','campa',this)">Campagnolo</div>
+          <div class="compat-chip" onclick="cmpPick('marq','kmc',this)">KMC</div>
+          <div class="compat-chip" onclick="cmpPick('marq','connex',this)">Connex</div>
         </div>
-        <div class="compat-pro-actions"><button class="compat-pro-btn" onclick="compatRunBrakes()">Analyser</button><button class="compat-pro-btn gray" onclick="compatFillDemo('brakes')">Exemple</button></div>
-      </div>
-      <div class="compat-pro-result" id="compatBrakeResult"></div>
-    </section>
-
-    <section class="compat-pro-panel" id="compatPanelStandards">
-      <div class="compat-pro-card">
-        <div class="compat-pro-title-sm">Standards atelier</div>
-        <div class="compat-pro-grid">
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Boîtier cadre</div><select class="compat-pro-select" id="cpBbStandard"><option>BSA</option><option>ITA</option><option>BB86</option><option>BB92</option><option>PF30</option><option>BB30</option><option>T47</option></select></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Axe pédalier</div><select class="compat-pro-select" id="cpCrankAxle"><option>24mm Shimano</option><option>GXP 24/22</option><option>DUB</option><option>30mm</option><option>Square taper cartridge</option></select></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Standard cadre/fourche</div><select class="compat-pro-select" id="cpFrameAxle"><option>QR 100/135</option><option>12x100 / 12x142</option><option>15x100 / 12x142</option><option>Boost 15x110 / 12x148</option></select></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Standard roue</div><select class="compat-pro-select" id="cpWheelAxle"><option>QR 100/135</option><option>12x100 / 12x142</option><option>15x100 / 12x142</option><option>Boost 15x110 / 12x148</option></select></div>
+        <div class="compat-field-lbl">Vitesses</div>
+        <div class="compat-chip-row" id="cmp_vit">
+          <div class="compat-chip" onclick="cmpPick('vit','678',this)">6/7/8v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','9',this)">9v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','10',this)">10v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','11',this)">11v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','12',this)">12v</div>
+          <div class="compat-chip" onclick="cmpPick('vit','13',this)">13v</div>
         </div>
-        <div class="compat-pro-actions"><button class="compat-pro-btn" onclick="compatRunStandards()">Analyser</button><button class="compat-pro-btn gray" onclick="compatFillDemo('standards')">Exemple</button></div>
+        <button class="compat-calc-btn" onclick="cmpCompute()">🔍 Trouver les compatibilités</button>
       </div>
-      <div class="compat-pro-result" id="compatStandardsResult"></div>
-    </section>
-
-    <section class="compat-pro-panel" id="compatPanelVelo">
-      <div class="compat-pro-card">
-        <div class="compat-pro-title-sm">Recherche vélo réel</div>
-        <div class="compat-pro-grid">
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Marque</div><input class="compat-pro-inp" id="cpBikeBrand" placeholder="ex : Genesis"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Modèle</div><input class="compat-pro-inp" id="cpBikeModel" placeholder="ex : Croix de Fer 20"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Année</div><input class="compat-pro-inp" id="cpBikeYear" placeholder="ex : 2024"></div>
-          <div class="compat-pro-field"><div class="compat-pro-lbl">Numéro série</div><input class="compat-pro-inp" id="cpBikeSerial" placeholder="optionnel · futur"></div>
-        </div>
-        <div class="compat-pro-actions"><button class="compat-pro-btn" onclick="compatSearchBike()">Rechercher</button><button class="compat-pro-btn gray" onclick="compatFillDemo('bike')">Exemple</button></div>
-        <div class="compat-pro-db-note">Base initiale de démonstration. À enrichir progressivement dans <strong>/data/bikes.json</strong>.</div>
-      </div>
-      <div class="compat-pro-result" id="compatBikeResult"></div>
-    </section>
-
-    <div style="height:30px"></div>
+    </div>
+    <div class="compat-result" id="cmpResult">
+      <div class="compat-result-title">✓ Chaînes compatibles</div>
+      <div class="compat-chain-list" id="cmpChainList"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:12px 0 7px">Alertes &amp; compatibilités cassettes</div>
+      <div class="compat-alert-list" id="cmpAlerts"></div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:12px 0 7px">Largeur de chaîne &amp; cassettes</div>
+      <div class="compat-chain-list" id="cmpLargeur"></div>
+    </div>
+    <div style="height:20px"></div>
   </div>
 </div>
-
 
 <!-- ══ GLOSSAIRE ══ -->
 <div class="screen" id="glossaire">
@@ -10895,8 +10829,7 @@ function buildAppointmentEmailHtml(r, note){
       <div style="font-size:13px;color:#6b7280;line-height:1.7;margin-top:18px">Merci de venir avec le vélo propre si possible. En cas d’empêchement, merci de nous prévenir.</div>
     </td></tr>
     <tr><td style="background:#111827;padding:16px 24px"><div style="font-size:11px;color:#6b7280">Généré par <strong style="color:#e8400c">VéloID</strong></div></td></tr>
-  </table></td></tr></table></body>
-</html>`;
+  </table></td></tr></table></body></html>`;
 }
 
 function sendAppointmentEmail(eventId){
@@ -11350,6 +11283,5 @@ function devisSetStatus(st){ devisStatus=st; if(st==='accepté' && !sigData('dev
   try{ ['veloid_depots','veloid_depot_seq_'+new Date().getFullYear(),'veloid_devis_enregistres'].forEach(k=>{ if(!window._extraSbKeys) window._extraSbKeys=[]; if(!window._extraSbKeys.includes(k)) window._extraSbKeys.push(k); if(Array.isArray(window.SB_DATA_KEYS) && !SB_DATA_KEYS.includes(k)) SB_DATA_KEYS.push(k); }); }catch(e){}
 })();
 </script>
-
 <script src="js/compatibility-engine.js"></script>
 </html>

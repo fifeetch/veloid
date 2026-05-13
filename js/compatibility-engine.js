@@ -1,212 +1,67 @@
-
+/* VéloID V9.3 — Assistant Compatibilité PRO Shimano/SRAM avec menus déroulants + saisie libre */
 (function(){
-  const fallback = {
-    shimano: null, sram: null, brakes: null, standards: null, bikes: null
-  };
-  const DB = { loaded:false, data:{} };
-  const DATA_FILES = {
-    shimano:'data/shimano.json',
-    sram:'data/sram.json',
-    brakes:'data/brakes.json',
-    standards:'data/standards.json',
-    bikes:'data/bikes.json'
-  };
+  const $ = (id)=>document.getElementById(id);
+  const norm = (s)=>String(s||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[–—_\/]+/g,'-').replace(/\s+/g,' ').trim();
+  const refNorm = (s)=>norm(s).replace(/\s+/g,'-').replace(/--+/g,'-');
+  const num = (v)=>{ const n=parseFloat(String(v||'').replace(',','.')); return isNaN(n)?0:n; };
+  const esc = (s)=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  let DB={};
+  async function loadJson(path){ const r=await fetch(path,{cache:'no-store'}); if(!r.ok) throw new Error(path+' '+r.status); return await r.json(); }
+  async function loadDB(){ try{ const [shimano,sram,standards,bikes]=await Promise.all([loadJson('data/shimano.json'),loadJson('data/sram.json'),loadJson('data/standards.json'),loadJson('data/bikes.json')]); DB={shimano,sram,standards,bikes,ready:true}; }catch(e){ console.warn('[VéloID] Compat PRO JSON non chargé',e); DB={ready:false}; } }
+  function allParts(kind){ let out=[]; if(DB.shimano?.[kind]) out=out.concat(DB.shimano[kind]); if(DB.sram?.[kind]) out=out.concat(DB.sram[kind]); return out; }
+  function findPart(kind, ref){ const q=refNorm(ref); if(!q) return null; const arr=allParts(kind); return arr.find(p=>refNorm(p.ref)===q) || arr.find(p=>refNorm(p.ref).includes(q)||q.includes(refNorm(p.ref))||norm(p.series).includes(norm(ref))); }
+  function speedsMatch(a,b){ if(!a||!b) return true; const aa=Array.isArray(a)?a:[a], bb=Array.isArray(b)?b:[b]; return aa.map(String).some(x=>bb.map(String).includes(x)); }
+  function freehubCompatible(cassette,input){ if(!cassette||!cassette.freehub||!input) return {ok:true,msg:'Corps roue libre non renseigné.'}; const want=norm(cassette.freehub), got=norm(input); if(want.includes('HG')&&got.includes('HG')) return {ok:true,msg:'Corps HG compatible.'}; if(want.includes('MICROSPLINE')&&(got.includes('MICROSPLINE')||got==='MS')) return {ok:true,msg:'MicroSpline compatible.'}; if(want==='XD'&&got==='XD') return {ok:true,msg:'XD compatible.'}; if(want==='XDR'&&got==='XDR') return {ok:true,msg:'XDR compatible.'}; if(want==='XD'&&got==='XDR') return {ok:true,condition:true,msg:'Cassette XD sur corps XDR possible avec entretoise 1,85 mm selon SRAM.'}; if(want.includes('HG ROAD')&&got.includes('HG')) return {ok:true,condition:true,msg:'Vérifier longueur corps HG route 11/12v et entretoises.'}; return {ok:false,msg:`Cassette prévue pour ${cassette.freehub}, corps saisi : ${input}.`}; }
+  function chainCompatible(chain,cassette,rd){ if(!chain||!cassette) return {ok:true,msg:'Chaîne non contrôlée.'}; if(!speedsMatch(chain.speeds,cassette.speeds)) return {ok:false,msg:`Chaîne ${chain.ref} non cohérente avec cassette ${cassette.speeds}v.`}; const fam=norm(cassette.family+' '+(rd?.series||'')); if(fam.includes('LINKGLIDE')&&!chain.linkglide) return {ok:false,msg:'LinkGlide/CUES : chaîne Shimano CN-LG500 recommandée/requise.'}; if((fam.includes('XPLR')||fam.includes('ROAD AXS'))&&cassette.brand==='SRAM'&&!chain.flattop) return {ok:false,msg:'SRAM Road/XPLR AXS : chaîne Flattop requise/recommandée.'}; if(fam.includes('EAGLE')&&!chain.eagle&&!chain.tType) return {ok:false,msg:'SRAM Eagle : chaîne Eagle/T-Type requise.'}; if(cassette.tType&&!chain.tType) return {ok:false,msg:'SRAM T-Type : chaîne T-Type requise.'}; return {ok:true,msg:`Chaîne ${chain.ref} cohérente (${chain.family||chain.speeds+'v'}).`}; }
+  function evaluateTransmission(){ const sh=findPart('shifters',$('v92Shifter')?.value), rd=findPart('rearDerailleurs',$('v92Rd')?.value), cas=findPart('cassettes',$('v92Cassette')?.value), ch=findPart('chains',$('v92Chain')?.value); const fs=num($('v92FrontSmall')?.value), fb=num($('v92FrontBig')?.value); const msgs=[],warns=[],fails=[];
+    if(!sh) warns.push('Shifter non reconnu dans la base MVP.'); else msgs.push(`Shifter reconnu : ${sh.ref} · ${sh.series}`);
+    if(!rd) fails.push('Dérailleur arrière non reconnu : contrôle incomplet.'); else msgs.push(`Dérailleur reconnu : ${rd.ref} · max ${rd.maxSprocket} dents · capacité ${rd.capacity}`);
+    if(!cas) fails.push('Cassette non reconnue : contrôle incomplet.'); else msgs.push(`Cassette reconnue : ${cas.ref} · ${cas.range[0]}-${cas.range[1]} · ${cas.freehub}`);
+    if(ch) msgs.push(`Chaîne reconnue : ${ch.ref} · ${ch.family||ch.speeds+'v'}`); else warns.push('Chaîne non reconnue : contrôle chaîne limité.');
+    if(sh&&rd){ if(sh.brand!==rd.brand) warns.push('Marques shifter/dérailleur différentes : à valider avec prudence.'); if(sh.pull!==rd.pull) fails.push(`Tirage/protocole incompatible : ${sh.pull} ≠ ${rd.pull}.`); else msgs.push('Tirage/protocole shifter ↔ dérailleur compatible.'); if(!speedsMatch(sh.speeds,rd.speeds)) fails.push(`Vitesses incohérentes shifter (${sh.speeds}) / dérailleur (${rd.speeds}).`); if(sh.system!==rd.system) fails.push(`Mécanique/électronique incompatible : ${sh.system} vs ${rd.system}.`); }
+    if(rd&&cas){ if(!speedsMatch(rd.speeds,cas.speeds)) fails.push(`Dérailleur ${rd.speeds}v avec cassette ${cas.speeds}v : non cohérent.`); const max=cas.range[1], min=cas.range[0]; if(max>rd.maxSprocket) fails.push(`Grand pignon ${max} dents > limite dérailleur ${rd.maxSprocket}.`); else msgs.push(`Grand pignon OK : ${max} ≤ ${rd.maxSprocket}.`); if(rd.minSprocket&&min<rd.minSprocket) warns.push(`Petit pignon ${min} dents : vérifier limite mini constructeur (${rd.minSprocket}).`); if(fs&&fb){ const cap=Math.max(0,fb-fs)+Math.max(0,cas.range[1]-cas.range[0]); if(rd.oneByOnly&&fb!==fs) fails.push(`${rd.ref} est prévu 1x : pédalier ${fs}/${fb} non cohérent.`); if(cap>rd.capacity) fails.push(`Capacité requise ${cap} dents > capacité dérailleur ${rd.capacity}.`); else msgs.push(`Capacité OK : ${cap} ≤ ${rd.capacity}.`); } else warns.push('Plateaux non saisis : capacité totale non calculée.'); const fh=freehubCompatible(cas,($('v92Freehub')?.value||'')); if(!fh.ok) fails.push(fh.msg); else if(fh.condition) warns.push(fh.msg); else msgs.push(fh.msg); }
+    const cc=chainCompatible(ch,cas,rd); if(!cc.ok) fails.push(cc.msg); else msgs.push(cc.msg); renderResult(fails.length?'bad':(warns.length?'warn':'ok'),msgs,warns,fails); }
+  function renderResult(status,msgs,warns,fails){ const box=$('v92Result'); if(!box) return; const title=status==='ok'?'COMPATIBLE':status==='warn'?'COMPATIBLE SOUS CONDITIONS':'NON COMPATIBLE'; const icon=status==='ok'?'✅':status==='warn'?'⚠️':'❌'; const cls=status==='ok'?'v92-ok':status==='warn'?'v92-warn':'v92-bad'; box.innerHTML=`<div class="v92-result ${cls}"><div class="v92-result-title">${icon} ${title}</div><div class="v92-result-sub">Analyse atelier : vitesses, tirage/protocole, capacité, pignon max, chaîne et corps de roue libre.</div>${fails.length?`<div class="v92-list bad"><strong>Blocages</strong>${fails.map(x=>`<div>❌ ${esc(x)}</div>`).join('')}</div>`:''}${warns.length?`<div class="v92-list warn"><strong>Points à vérifier</strong>${warns.map(x=>`<div>⚠️ ${esc(x)}</div>`).join('')}</div>`:''}<div class="v92-list ok"><strong>Contrôles validés / infos</strong>${msgs.map(x=>`<div>✓ ${esc(x)}</div>`).join('')}</div><div class="v92-small">Base V9.2 MVP : familles Shimano/SRAM prioritaires. Vérifier fiche constructeur en cas de doute.</div></div>`; }
 
-  function norm(v){ return String(v||'').trim().toUpperCase().replace(/\s+/g,' '); }
-  function byId(id){ return document.getElementById(id); }
-  function setVal(id,v){ const el=byId(id); if(el) el.value=v; }
-
-  async function loadDb(){
-    const entries = await Promise.all(Object.entries(DATA_FILES).map(async ([key,url])=>{
-      try{
-        const res = await fetch(url, {cache:'no-store'});
-        if(!res.ok) throw new Error(res.status+' '+url);
-        return [key, await res.json(), null];
-      }catch(e){ return [key, null, e]; }
-    }));
-    entries.forEach(([k,data])=>{ DB.data[k]=data; });
-    DB.loaded = Object.values(DB.data).some(Boolean);
-    const st=byId('compatDbStatus');
-    if(st){
-      const ok = Object.values(DB.data).filter(Boolean).length;
-      st.textContent = ok ? `Base chargée : ${ok}/5 fichiers JSON` : 'Base non chargée : vérifier les dossiers /data et /js sur GitHub Pages';
-      st.style.color = ok ? 'var(--green)' : '#ef4444';
-    }
+  function partLabel(p){ return `${p.ref} — ${p.brand||''} ${p.series||p.family||''}${p.speeds?` · ${Array.isArray(p.speeds)?p.speeds.join('/'):p.speeds}v`:''}`; }
+  function sortedParts(kind){ return allParts(kind).slice().sort((a,b)=>String(a.brand+' '+a.series+' '+a.ref).localeCompare(String(b.brand+' '+b.series+' '+b.ref))); }
+  function syncFromSelect(inputId, selectId){ const inp=$(inputId), sel=$(selectId); if(inp&&sel&&sel.value) inp.value=sel.value; }
+  function clearTransmission(){ ['v92Shifter','v92Rd','v92Cassette','v92Chain','v92FrontSmall','v92FrontBig','v92Freehub'].forEach(id=>{ const el=$(id); if(el) el.value=''; }); ['v93ShifterSelect','v93RdSelect','v93CassetteSelect','v93ChainSelect'].forEach(id=>{ const el=$(id); if(el) el.value=''; }); const r=$('v92Result'); if(r) r.innerHTML=''; }
+  function applyPreset(name){
+    const presets={
+      'shimano_105_11_2x': ['ST-R7000','RD-R7000-GS','CS-HG700 11-34','CN-HG601','34','50','HG'],
+      'shimano_grx_11_1x': ['ST-RX810','RD-RX812','CS-M8000 11-42','CN-HG701','40','40','HG'],
+      'shimano_grx_12_1x45': ['ST-RX820','RD-RX822-GS','CS-M8100 10-45','CN-M8100','40','40','MicroSpline'],
+      'shimano_deore_12': ['SL-M6100-R','RD-M6100-SGS','CS-M6100 10-51','CN-M6100','32','32','MicroSpline'],
+      'shimano_cues_10': ['SL-U6000-10R','RD-U6000','CS-LG400-10 11-48','CN-LG500','32','46','HG'],
+      'sram_rival_xplr': ['ED-RIV-D1','RD-RIV1-E-D1','XG-1251 10-44','CN-RIV-D1','40','40','XDR'],
+      'sram_eagle_gx': ['EC-AXS-POD','RD-GX-1E-A1','XG-1275 10-52','CN-EAGL-GX-A1','32','32','XD'],
+      'sram_ttype': ['EC-AXS-POD','RD-GX-E-B1','XS-1275 10-52','CN-TTYP-GX-A1','32','32','XD']
+    };
+    const v=presets[name]; if(!v) return;
+    ['v92Shifter','v92Rd','v92Cassette','v92Chain','v92FrontSmall','v92FrontBig','v92Freehub'].forEach((id,i)=>{ const el=$(id); if(el) el.value=v[i]; });
+    ['v93ShifterSelect','v93RdSelect','v93CassetteSelect','v93ChainSelect'].forEach((id,i)=>{ const el=$(id); if(el) el.value=v[i]; });
+    evaluateTransmission();
   }
 
-  function getBrandDb(){
-    const b = byId('cpBrand')?.value || 'shimano';
-    return DB.data[b] || {derailleurs:[], shifters:[], cassettes:[], chains:[]};
+  function fillOptions(){
+    const fill=(listId,selectId,arr)=>{
+      const parts=arr.slice().sort((a,b)=>partLabel(a).localeCompare(partLabel(b)));
+      const dl=$(listId); if(dl) dl.innerHTML=parts.map(p=>`<option value="${esc(p.ref)}">${esc(partLabel(p))}</option>`).join('');
+      const sel=$(selectId); if(sel) sel.innerHTML='<option value="">— Choisir dans la base —</option>'+parts.map(p=>`<option value="${esc(p.ref)}">${esc(partLabel(p))}</option>`).join('');
+    };
+    fill('v92ShifterList','v93ShifterSelect',sortedParts('shifters'));
+    fill('v92RdList','v93RdSelect',sortedParts('rearDerailleurs'));
+    fill('v92CassetteList','v93CassetteSelect',sortedParts('cassettes'));
+    fill('v92ChainList','v93ChainSelect',sortedParts('chains'));
   }
-
-  function findRef(list, ref){
-    const n=norm(ref);
-    if(!n) return null;
-    return (list||[]).find(x => norm(x.ref)===n || n.includes(norm(x.ref)) || norm(x.ref).includes(n));
-  }
-
-  function parseCassette(input){
-    const n=norm(input);
-    const m=n.match(/(\d{2})\s*[-/]\s*(\d{2})/);
-    if(!m) return null;
-    return {smallest:+m[1], largest:+m[2], range:m[1]+'-'+m[2]};
-  }
-
-  function resultBox(id, status, title, lines){
-    const el=byId(id); if(!el) return;
-    let cls = status==='ok'?'ok':status==='ko'?'ko':'warn';
-    let label = status==='ok'?'COMPATIBLE':status==='ko'?'NON COMPATIBLE':'COMPATIBLE SOUS CONDITIONS';
-    el.innerHTML = `
-      <div class="compat-pro-status ${cls}">${label} · ${escapeHtml(title||'Analyse')}</div>
-      <div class="compat-pro-list">
-        ${(lines||[]).map(l=>`<div class="compat-pro-line ${l.type||''}">${l.html||escapeHtml(l.text||'')}</div>`).join('')}
-      </div>`;
-    el.classList.add('show');
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-  }
-
-  window.compatProTab = function(name, btn){
-    document.querySelectorAll('.compat-pro-tab').forEach(b=>b.classList.remove('active'));
-    if(btn) btn.classList.add('active');
-    document.querySelectorAll('.compat-pro-panel').forEach(p=>p.classList.remove('active'));
-    const map={transmission:'compatPanelTransmission', freinage:'compatPanelFreinage', standards:'compatPanelStandards', velo:'compatPanelVelo'};
-    byId(map[name])?.classList.add('active');
-  };
-
-  window.compatFillDemo = function(type){
-    if(type==='transmission'){
-      setVal('cpBrand','shimano'); setVal('cpFreehub','HG'); setVal('cpShifter','ST-R7000'); setVal('cpRearDerailleur','RD-R7000-GS'); setVal('cpCassette','CS-HG700 11-34'); setVal('cpChain','CN-HG601');
-    }
-    if(type==='brakes'){
-      setVal('cpBrakeLever','ST-RX400'); setVal('cpBrakeCaliper','BR-RX400'); setVal('cpRotor','160'); setVal('cpBrakeMount','Flat mount');
-    }
-    if(type==='standards'){
-      setVal('cpBbStandard','BSA'); setVal('cpCrankAxle','24mm Shimano'); setVal('cpFrameAxle','QR 100/135'); setVal('cpWheelAxle','12x100 / 12x142');
-    }
-    if(type==='bike'){
-      setVal('cpBikeBrand','Genesis'); setVal('cpBikeModel','Croix de Fer 20'); setVal('cpBikeYear','2024');
-    }
-  };
-
-  window.compatRunTransmission = function(){
-    const db=getBrandDb();
-    const sh=findRef(db.shifters, byId('cpShifter')?.value);
-    const rd=findRef(db.derailleurs, byId('cpRearDerailleur')?.value);
-    const cas=findRef(db.cassettes, byId('cpCassette')?.value);
-    const chain=findRef(db.chains, byId('cpChain')?.value);
-    const freehub=norm(byId('cpFreehub')?.value);
-    const parsed=parseCassette(byId('cpCassette')?.value);
-    const lines=[]; let errors=0, warns=0;
-
-    if(!sh){ lines.push({type:'warn',text:'Commande non trouvée dans la base. Vérifier la référence ou enrichir le JSON.'}); warns++; }
-    else lines.push({type:'ok',html:`Commande reconnue : <strong>${escapeHtml(sh.ref)}</strong> · ${escapeHtml(sh.speeds)}v · tirage ${escapeHtml(sh.cablePull)}`});
-    if(!rd){ lines.push({type:'warn',text:'Dérailleur arrière non trouvé dans la base.'}); warns++; }
-    else lines.push({type:'ok',html:`Dérailleur reconnu : <strong>${escapeHtml(rd.ref)}</strong> · max pignon ${rd.maxSprocket}D · capacité ${rd.capacity}D`});
-    if(!cas && !parsed){ lines.push({type:'warn',text:'Cassette non trouvée et plage non lisible. Format conseillé : CS-HG700 11-34.'}); warns++; }
-    else {
-      const largest=(cas&&cas.largest)||(parsed&&parsed.largest);
-      const smallest=(cas&&cas.smallest)||(parsed&&parsed.smallest);
-      lines.push({type:'ok',html:`Cassette analysée : <strong>${escapeHtml((cas&&cas.ref)||byId('cpCassette')?.value)}</strong> · ${smallest}-${largest}`});
-      if(rd && largest > rd.maxSprocket){ lines.push({type:'ko',html:`Grand pignon ${largest}D supérieur au maximum constructeur du dérailleur (${rd.maxSprocket}D).`}); errors++; }
-      if(rd && smallest < rd.minSprocket){ lines.push({type:'warn',html:`Petit pignon ${smallest}D inférieur à la plage renseignée (${rd.minSprocket}D). À vérifier constructeur.`}); warns++; }
-    }
-    if(!chain){ lines.push({type:'warn',text:'Chaîne non trouvée dans la base.'}); warns++; }
-    else lines.push({type:'ok',html:`Chaîne reconnue : <strong>${escapeHtml(chain.ref)}</strong> · ${chain.speeds}v · ${escapeHtml(chain.type)}`});
-    if(sh && rd){
-      if(sh.speeds !== rd.speeds){ lines.push({type:'ko',html:`Nombre de vitesses incohérent : commande ${sh.speeds}v / dérailleur ${rd.speeds}v.`}); errors++; }
-      if(sh.cablePull !== rd.cablePull){ lines.push({type:'ko',html:`Tirage câble incompatible : ${escapeHtml(sh.cablePull)} ≠ ${escapeHtml(rd.cablePull)}.`}); errors++; }
-      if(sh.speeds === rd.speeds && sh.cablePull === rd.cablePull) lines.push({type:'ok',text:'Commande et dérailleur : vitesses et tirage câble cohérents.'});
-    }
-    if(chain && sh && chain.speeds !== sh.speeds){ lines.push({type:'ko',html:`Chaîne ${chain.speeds}v non cohérente avec commande ${sh.speeds}v.`}); errors++; }
-    if(cas && sh && cas.speeds !== sh.speeds){ lines.push({type:'ko',html:`Cassette ${cas.speeds}v non cohérente avec commande ${sh.speeds}v.`}); errors++; }
-    if(cas && freehub && norm(cas.freehub)!==freehub){
-      lines.push({type:'ko',html:`Corps roue libre requis : ${escapeHtml(cas.freehub)}. Sélection actuelle : ${escapeHtml(freehub)}.`}); errors++;
-    } else if(cas) {
-      lines.push({type:'ok',html:`Corps roue libre : ${escapeHtml(freehub)} compatible avec la cassette.`});
-    }
-    const status = errors ? 'ko' : warns ? 'warn' : 'ok';
-    resultBox('compatTransmissionResult', status, 'Transmission', lines);
-  };
-
-  window.compatRunBrakes = function(){
-    const db=DB.data.brakes || {levers:[],calipers:[]};
-    const lever=findRef(db.levers, byId('cpBrakeLever')?.value);
-    const cal=findRef(db.calipers, byId('cpBrakeCaliper')?.value);
-    const rotor=Number(byId('cpRotor')?.value||0);
-    const mount=String(byId('cpBrakeMount')?.value||'');
-    const lines=[]; let errors=0, warns=0;
-    if(!lever){ lines.push({type:'warn',text:'Levier non trouvé dans la base.'}); warns++; } else lines.push({type:'ok',html:`Levier reconnu : <strong>${escapeHtml(lever.ref)}</strong> · ${escapeHtml(lever.type)}`});
-    if(!cal){ lines.push({type:'warn',text:'Étrier non trouvé dans la base.'}); warns++; } else lines.push({type:'ok',html:`Étrier reconnu : <strong>${escapeHtml(cal.ref)}</strong> · ${escapeHtml(cal.type)} · montage ${escapeHtml(cal.mount||'n/c')}`});
-    if(lever && cal){
-      if(lever.type !== cal.type){ lines.push({type:'ko',html:`Type de commande incompatible : levier ${escapeHtml(lever.type)} / étrier ${escapeHtml(cal.type)}.`}); errors++; }
-      else lines.push({type:'ok',text:'Type levier / étrier cohérent.'});
-      if(lever.fluid || cal.fluid){
-        if(lever.fluid !== cal.fluid){ lines.push({type:'ko',html:`Fluide incompatible : levier ${escapeHtml(lever.fluid)} / étrier ${escapeHtml(cal.fluid)}.`}); errors++; }
-        else lines.push({type:'ok',html:`Fluide hydraulique cohérent : ${escapeHtml(lever.fluid)}.`});
-      }
-    }
-    if(cal && Array.isArray(cal.rotors)){
-      if(!cal.rotors.includes(rotor)){ lines.push({type:'warn',html:`Rotor ${rotor} mm non listé pour cet étrier dans la base. Adaptateur ou limite cadre/fourche à vérifier.`}); warns++; }
-      else lines.push({type:'ok',html:`Rotor ${rotor} mm listé compatible côté étrier.`});
-    }
-    if(cal && cal.mount && !norm(cal.mount).includes(norm(mount).split(' ')[0])){ lines.push({type:'warn',html:`Montage cadre/fourche ${escapeHtml(mount)} : vérifier adaptateur avec étrier ${escapeHtml(cal.mount)}.`}); warns++; }
-    const status=errors?'ko':warns?'warn':'ok';
-    resultBox('compatBrakeResult', status, 'Freinage', lines);
-  };
-
-  window.compatRunStandards = function(){
-    const db=DB.data.standards || {bottomBrackets:[], axles:[]};
-    const bb=byId('cpBbStandard')?.value;
-    const axle=byId('cpCrankAxle')?.value;
-    const frame=byId('cpFrameAxle')?.value;
-    const wheel=byId('cpWheelAxle')?.value;
-    const lines=[]; let warns=0, errors=0;
-    const bbObj=(db.bottomBrackets||[]).find(x=>x.standard===bb);
-    if(bbObj){
-      const comp=(bbObj.compatibleAxles||[]).some(a=>norm(a).includes(norm(axle).split(' ')[0]) || norm(axle).includes(norm(a).split(' ')[0]));
-      lines.push({type:'ok',html:`Boîtier ${escapeHtml(bb)} : ${bbObj.thread?escapeHtml(bbObj.thread):'Ø '+escapeHtml(bbObj.diameter)+' mm'} · largeurs ${escapeHtml((bbObj.shellWidths||[]).join('/'))} mm.`});
-      if(comp) lines.push({type:'ok',html:`Axe pédalier ${escapeHtml(axle)} : compatible direct ou avec cuvettes adaptées selon la base.`});
-      else { lines.push({type:'warn',html:`Axe ${escapeHtml(axle)} non listé pour ${escapeHtml(bb)}. Adaptateur spécifique à vérifier.`}); warns++; }
-    } else { lines.push({type:'warn',text:'Standard de boîtier absent de la base.'}); warns++; }
-    const ax=(db.axles||[]).find(x=>x.frame===frame && x.wheel===wheel);
-    if(ax){
-      const t=norm(ax.result).includes('NON')?'ko':norm(ax.result).includes('SEULEMENT')||norm(ax.result).includes('SAUF')?'warn':'ok';
-      if(t==='ko') errors++; if(t==='warn') warns++;
-      lines.push({type:t,html:`Axes roues : cadre <strong>${escapeHtml(frame)}</strong> / roue <strong>${escapeHtml(wheel)}</strong> → ${escapeHtml(ax.result)}.`});
-    } else { lines.push({type:'warn',text:'Combinaison axe non trouvée dans la base. Vérifier entraxes et end caps.'}); warns++; }
-    const status=errors?'ko':warns?'warn':'ok';
-    resultBox('compatStandardsResult', status, 'Standards atelier', lines);
-  };
-
-  window.compatSearchBike = function(){
-    const db=DB.data.bikes || {models:[]};
-    const brand=norm(byId('cpBikeBrand')?.value);
-    const model=norm(byId('cpBikeModel')?.value);
-    const year=norm(byId('cpBikeYear')?.value);
-    const matches=(db.models||[]).filter(b=>{
-      return (!brand || norm(b.brand).includes(brand)) && (!model || norm(b.model).includes(model) || model.includes(norm(b.model))) && (!year || norm(b.year).includes(year) || year.includes(norm(b.year)));
-    });
-    const lines=[];
-    if(!matches.length){
-      resultBox('compatBikeResult','warn','Recherche vélo',[{type:'warn',text:'Aucun vélo trouvé dans /data/bikes.json. Ajouter la fiche modèle ou élargir la recherche.'}]);
-      return;
-    }
-    matches.forEach(b=>{
-      lines.push({type:'ok',html:`<div class="compat-pro-bike-head">${escapeHtml(b.brand)} ${escapeHtml(b.model)} · ${escapeHtml(b.year)}</div><div class="compat-pro-bike-meta">${escapeHtml(b.category||'')}</div>`});
-      ['drivetrain','brakes','wheelAxles','bottomBracket','headset','seatpost','tireClearance'].forEach(k=>{
-        if(b[k]) lines.push({html:`<strong>${escapeHtml(label(k))}</strong> : ${escapeHtml(b[k])}`});
-      });
-      (b.notes||[]).forEach(n=>lines.push({type:'warn',html:`Note atelier : ${escapeHtml(n)}`}));
-    });
-    resultBox('compatBikeResult','ok','Fiche vélo',lines);
-  };
-
-  function label(k){
-    return {drivetrain:'Transmission origine', brakes:'Freinage', wheelAxles:'Axes / roues', bottomBracket:'Boîtier', headset:'Jeu de direction', seatpost:'Tige de selle', tireClearance:'Passage pneus'}[k] || k;
-  }
-
-  window.addEventListener('DOMContentLoaded', loadDb);
+  function renderStandards(){ const el=$('v92Standards'); if(!el) return; const st=DB.standards||{}; el.innerHTML=`<div class="v92-note">Freehub / cassette : HG, MicroSpline, XD, XDR. BB : BSA, BB86/92, PF30/BB30, T47.</div>`+(st.freehubs||[]).map(f=>`<div class="v92-mini"><strong>${esc(f.name)}</strong><br>${esc((f.accepts||[]).join(' · '))}<br><span>${esc((f.warnings||[]).join(' · '))}</span></div>`).join('')+`<div class="v92-card-title small">Boîtiers</div>`+(st.bottomBrackets||[]).map(b=>`<div class="v92-mini"><strong>${esc(b.frame)}</strong><br>${esc((b.cranks||[]).join(' · '))}<br><span>${esc(b.note)}</span></div>`).join(''); }
+  function renderBrakes(){ const el=$('v92Brakes'); if(!el) return; const st=DB.standards||{}; el.innerHTML=`<div class="v92-note">Contrôle V1 : fluide, famille système, tirage mécanique. Ne mélange jamais DOT et huile minérale.</div>`+(st.brakes||[]).map(b=>`<div class="v92-mini"><strong>${esc(b.system)}</strong><br>Fluide : ${esc(b.fluid)}<br>${esc((b.compatibleWith||[]).join(' · '))}<br><span>${esc((b.warnings||[]).join(' · '))}</span></div>`).join(''); }
+  function searchBike(q){ const el=$('v92BikeResults'); if(!el) return; q=norm(q); const list=DB.bikes?.models||[]; const res=list.filter(b=>!q||norm(b.brand+' '+b.model+' '+b.year).includes(q)); el.innerHTML=res.map(b=>`<div class="v92-mini"><strong>${esc(b.brand)} ${esc(b.model)} ${esc(b.year)}</strong><br>BB : ${esc(b.bb)}<br>Axes : ${esc(b.axles)}<br>JDD : ${esc(b.headset)}<br><span>${esc(b.notes)}</span></div>`).join('')||'<div class="v92-note">Aucun vélo trouvé dans la base MVP.</div>'; }
+  function tab(name,btn){ document.querySelectorAll('.v92-tabs button').forEach(b=>b.classList.remove('active')); btn&&btn.classList.add('active'); document.querySelectorAll('.v92-panel').forEach(p=>p.classList.remove('active')); ({transmission:'v92PanelTransmission',standards:'v92PanelStandards',freins:'v92PanelFreins',velo:'v92PanelVelo'}[name]&&$({transmission:'v92PanelTransmission',standards:'v92PanelStandards',freins:'v92PanelFreins',velo:'v92PanelVelo'}[name])?.classList.add('active')); }
+  function demo(type){ if(type==='sram'){ $('v92Shifter').value='ED-RIV-D1'; $('v92Rd').value='RD-RIV1-E-D1'; $('v92Cassette').value='XG-1251 10-44'; $('v92Chain').value='CN-RIV-D1'; $('v92FrontSmall').value='40'; $('v92FrontBig').value='40'; $('v92Freehub').value='XDR'; } else { $('v92Shifter').value='ST-R7000'; $('v92Rd').value='RD-R7000-GS'; $('v92Cassette').value='CS-HG700 11-34'; $('v92Chain').value='CN-HG601'; $('v92FrontSmall').value='34'; $('v92FrontBig').value='50'; $('v92Freehub').value='HG'; } evaluateTransmission(); }
+  function injectCss(){ if($('v92Css')) return; const s=document.createElement('style'); s.id='v92Css'; s.textContent=`.v92-hero{border-radius:24px;padding:17px;margin-bottom:14px;background:linear-gradient(135deg,rgba(245,158,11,.18),rgba(45,127,249,.12));border:1px solid rgba(255,255,255,.09)}.v92-kicker{font-family:'JetBrains Mono',monospace;font-size:10px;color:#f59e0b;letter-spacing:.16em;text-transform:uppercase}.v92-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-top:4px}.v92-sub{font-size:12px;color:var(--text2);line-height:1.55;margin-top:5px}.v92-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}.v92-tabs button{height:39px;border-radius:12px;border:1.5px solid var(--border2);background:var(--card);color:var(--text2);font-family:'Syne',sans-serif;font-size:12px;font-weight:800}.v92-tabs button.active{background:var(--red);border-color:var(--red);color:#fff}.v92-panel{display:none}.v92-panel.active{display:block}.v92-card{background:var(--card);border:1px solid var(--border);border-radius:15px;padding:14px;margin-bottom:12px}.v92-card-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--text);margin-bottom:12px}.v92-card-title.small{font-size:13px;margin-top:12px}.v92-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:9px}.v92-grid.three{grid-template-columns:1fr 1fr 1fr}.v92-grid label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase}.v92-grid input,.v92-grid select,.v92-search{width:100%;margin-top:5px;background:var(--card2);border:1px solid var(--border2);border-radius:9px;padding:10px 12px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;outline:none}.v92-actions{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:8px;margin-top:10px}.v92-actions button{height:42px;border:none;border-radius:12px;background:var(--green);color:#fff;font-family:'Syne',sans-serif;font-size:13px;font-weight:800}.v92-actions button.ghost{background:var(--card2);color:var(--text2);border:1px solid var(--border2)}.v92-result{border-radius:15px;padding:14px;margin-bottom:12px;border:2px solid var(--green);background:rgba(34,197,94,.08)}.v92-result.v92-warn{border-color:var(--gold);background:rgba(245,158,11,.08)}.v92-result.v92-bad{border-color:#ef4444;background:rgba(239,68,68,.08)}.v92-result-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--text)}.v92-result-sub,.v92-small,.v92-note{font-size:12px;color:var(--text2);line-height:1.55;margin-top:5px}.v92-list{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:11px;margin-top:10px;font-size:12px;color:var(--text2);line-height:1.65}.v92-list strong{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}.v92-list.bad{border-color:rgba(239,68,68,.25)}.v92-list.warn{border-color:rgba(245,158,11,.25)}.v92-mini{background:var(--card2);border:1px solid var(--border2);border-radius:12px;padding:11px 12px;margin-bottom:8px;font-size:12px;color:var(--text2);line-height:1.55}.v92-mini strong{font-family:'Syne',sans-serif;font-size:14px;color:var(--text)}.v92-mini span{color:var(--muted)}.v93-presets{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}.v93-presets button{border:1px solid var(--border2);background:var(--card2);color:var(--text2);border-radius:999px;padding:7px 10px;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;cursor:pointer}.v93-presets button:active{transform:scale(.96);background:rgba(45,127,249,.14);color:#60a5fa}.v92-grid select+input{margin-top:6px}@media(max-width:560px){.v92-tabs{grid-template-columns:1fr 1fr}.v92-grid,.v92-grid.three,.v92-actions{grid-template-columns:1fr}}body.light-mode .v92-hero{background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(45,127,249,.08));border-color:rgba(0,0,0,.08)}`; document.head.appendChild(s); }
+  function renderCompatScreen(){ const root=$('compat'); if(!root) return; root.innerHTML=`<div class="diag-hdr"><div class="btn-back" onclick="goHome()">‹</div><div class="dh-info"><div class="dh-title">Assistant Compatibilité PRO</div><div class="dh-step">Shimano · SRAM · menus déroulants + saisie référence</div></div></div><div class="compat-scroll v92-scroll"><div class="v92-hero"><div class="v92-kicker">V9.3 · Base atelier élargie</div><div class="v92-title">Compatibilité atelier PRO</div><div class="v92-sub">Tu peux soit taper une référence, soit choisir dans les menus déroulants. Base élargie Shimano/SRAM : route, GRX, MTB, CUES, AXS, XPLR, Eagle.</div></div><div class="v92-tabs"><button class="active" onclick="v92Tab('transmission',this)">Transmission</button><button onclick="v92Tab('standards',this)">Standards</button><button onclick="v92Tab('freins',this)">Freinage</button><button onclick="v92Tab('velo',this)">Recherche vélo</button></div><section class="v92-panel active" id="v92PanelTransmission"><div class="v92-card"><div class="v92-card-title">Transmission Shimano / SRAM</div><div class="v92-note">Utilisation atelier : sélectionne une référence dans le menu ou tape-la directement. Le moteur contrôle tirage/protocole, vitesses, capacité, pignon max, chaîne et corps de roue libre.</div><div class="v93-presets"><button onclick="VeloCompatPro.applyPreset('shimano_105_11_2x')">105 2x11</button><button onclick="VeloCompatPro.applyPreset('shimano_grx_11_1x')">GRX 1x11</button><button onclick="VeloCompatPro.applyPreset('shimano_grx_12_1x45')">GRX 1x12</button><button onclick="VeloCompatPro.applyPreset('shimano_deore_12')">Deore 12v</button><button onclick="VeloCompatPro.applyPreset('shimano_cues_10')">CUES</button><button onclick="VeloCompatPro.applyPreset('sram_rival_xplr')">Rival XPLR</button><button onclick="VeloCompatPro.applyPreset('sram_eagle_gx')">GX Eagle</button><button onclick="VeloCompatPro.applyPreset('sram_ttype')">T-Type</button></div><div class="v92-grid"><label>Shifter / commande<select id="v93ShifterSelect" onchange="VeloCompatPro.syncFromSelect('v92Shifter','v93ShifterSelect')"></select><input id="v92Shifter" list="v92ShifterList" placeholder="taper une ref : ST-R7000, ST-RX820, ED-RIV-D1"><datalist id="v92ShifterList"></datalist></label><label>Dérailleur arrière<select id="v93RdSelect" onchange="VeloCompatPro.syncFromSelect('v92Rd','v93RdSelect')"></select><input id="v92Rd" list="v92RdList" placeholder="taper une ref : RD-R7000-GS, RD-RX822, RD-GX-E-B1"><datalist id="v92RdList"></datalist></label></div><div class="v92-grid"><label>Cassette<select id="v93CassetteSelect" onchange="VeloCompatPro.syncFromSelect('v92Cassette','v93CassetteSelect')"></select><input id="v92Cassette" list="v92CassetteList" placeholder="taper une ref : CS-HG700 11-34, XG-1251 10-44"><datalist id="v92CassetteList"></datalist></label><label>Chaîne<select id="v93ChainSelect" onchange="VeloCompatPro.syncFromSelect('v92Chain','v93ChainSelect')"></select><input id="v92Chain" list="v92ChainList" placeholder="taper une ref : CN-HG601, CN-LG500, CN-RIV-D1"><datalist id="v92ChainList"></datalist></label></div><div class="v92-grid three"><label>Petit plateau<input id="v92FrontSmall" type="number" placeholder="ex : 34 ou 40"></label><label>Grand plateau<input id="v92FrontBig" type="number" placeholder="ex : 50 ou 40"></label><label>Corps roue libre<select id="v92Freehub"><option value="">Non renseigné</option><option>HG</option><option>HG Road</option><option>MicroSpline</option><option>XD</option><option>XDR</option></select></label></div><div class="v92-actions"><button onclick="VeloCompatPro.evaluateTransmission()">Analyser compatibilité</button><button class="ghost" onclick="VeloCompatPro.clearTransmission()">Réinitialiser</button><button class="ghost" onclick="VeloCompatPro.demo('shimano')">Exemple Shimano</button></div></div><div id="v92Result"></div></section><section class="v92-panel" id="v92PanelStandards"><div class="v92-card"><div class="v92-card-title">Standards atelier</div><div id="v92Standards"></div></div></section><section class="v92-panel" id="v92PanelFreins"><div class="v92-card"><div class="v92-card-title">Freinage PRO</div><div id="v92Brakes"></div></div></section><section class="v92-panel" id="v92PanelVelo"><div class="v92-card"><div class="v92-card-title">Recherche vélo</div><input class="v92-search" id="v92BikeSearch" placeholder="ex : Genesis Croix de Fer" oninput="VeloCompatPro.searchBike(this.value)"><div id="v92BikeResults"></div></div></section></div>`; fillOptions(); renderStandards(); renderBrakes(); searchBike(''); }
+  window.v92Tab=tab; window.VeloCompatPro={evaluateTransmission,demo,searchBike,renderCompatScreen,syncFromSelect,clearTransmission,applyPreset};
+  document.addEventListener('DOMContentLoaded', async()=>{ injectCss(); await loadDB(); renderCompatScreen(); });
 })();

@@ -1,142 +1,112 @@
 {
-  "version": "0.1",
+  "freehubs": [
+    {
+      "name": "HG",
+      "accepts": [
+        "Shimano HG 8-12 route",
+        "SRAM PG 11/12 départ 11 dents"
+      ],
+      "warnings": [
+        "Pas de cassettes départ 10 dents XD/XDR/MicroSpline"
+      ]
+    },
+    {
+      "name": "MicroSpline",
+      "accepts": [
+        "Shimano MTB 12v 10-45/10-51"
+      ],
+      "warnings": [
+        "Nécessaire pour Shimano MTB 12v 10 dents"
+      ]
+    },
+    {
+      "name": "XD",
+      "accepts": [
+        "SRAM Eagle / XD départ 10 dents"
+      ],
+      "warnings": [
+        "XDR accepte XD avec entretoise 1,85 mm selon SRAM"
+      ]
+    },
+    {
+      "name": "XDR",
+      "accepts": [
+        "SRAM Road/XPLR AXS 10 dents",
+        "XD avec entretoise 1,85 mm"
+      ],
+      "warnings": [
+        "Interface route 1,85 mm plus longue que XD"
+      ]
+    }
+  ],
   "bottomBrackets": [
     {
-      "standard": "BSA",
-      "shellWidths": [
-        68,
-        73
+      "frame": "BSA 68/73",
+      "cranks": [
+        "Shimano 24 mm",
+        "SRAM DUB BSA",
+        "SRAM GXP BSA",
+        "Carré JIS"
       ],
-      "thread": "1.37x24 BSA",
-      "compatibleAxles": [
-        "24mm Shimano",
-        "GXP 24/22",
-        "DUB with adapter",
-        "Square taper cartridge"
-      ]
+      "note": "Standard fileté très courant atelier."
     },
     {
-      "standard": "ITA",
-      "shellWidths": [
-        70
+      "frame": "BB86/BB92",
+      "cranks": [
+        "Shimano 24 mm pressfit",
+        "SRAM DUB pressfit"
       ],
-      "thread": "36x24 ITA",
-      "compatibleAxles": [
-        "24mm Shimano ITA",
-        "Square taper ITA"
-      ]
+      "note": "Vérifier largeur et entretoises."
     },
     {
-      "standard": "BB86",
-      "shellWidths": [
-        86.5
+      "frame": "PF30/BB30",
+      "cranks": [
+        "30 mm",
+        "DUB via boîtier adapté",
+        "24 mm via adaptateur"
       ],
-      "diameter": 41,
-      "compatibleAxles": [
-        "24mm Shimano",
-        "GXP with adapter",
-        "DUB with specific BB"
-      ]
+      "note": "Attention aux adaptateurs/craquements."
     },
     {
-      "standard": "BB92",
-      "shellWidths": [
-        89.5,
-        92
-      ],
-      "diameter": 41,
-      "compatibleAxles": [
-        "24mm Shimano MTB",
-        "GXP MTB with adapter",
-        "DUB with specific BB"
-      ]
-    },
-    {
-      "standard": "PF30",
-      "shellWidths": [
-        68,
-        73
-      ],
-      "diameter": 46,
-      "compatibleAxles": [
-        "30mm",
-        "DUB with adapter",
-        "24mm with reducing adapter"
-      ]
-    },
-    {
-      "standard": "BB30",
-      "shellWidths": [
-        68,
-        73
-      ],
-      "diameter": 42,
-      "compatibleAxles": [
-        "30mm short spindle",
-        "24mm with adapter"
-      ]
-    },
-    {
-      "standard": "T47",
-      "shellWidths": [
-        68,
-        73,
-        85.5,
-        86.5
-      ],
-      "thread": "T47",
-      "compatibleAxles": [
-        "24mm Shimano",
+      "frame": "T47",
+      "cranks": [
+        "24 mm",
         "DUB",
-        "30mm",
-        "GXP"
+        "30 mm selon cuvettes"
+      ],
+      "note": "Fileté grand diamètre moderne."
+    }
+  ],
+  "brakes": [
+    {
+      "system": "Shimano hydraulique route/gravel",
+      "fluid": "mineral",
+      "compatibleWith": [
+        "Shimano étrier route/gravel minéral"
+      ],
+      "warnings": [
+        "Ne jamais mélanger DOT et huile minérale"
       ]
-    }
-  ],
-  "axles": [
-    {
-      "frame": "QR 100/135",
-      "wheel": "QR 100/135",
-      "result": "compatible direct"
     },
     {
-      "frame": "QR 100/135",
-      "wheel": "12x100 / 12x142",
-      "result": "compatible seulement si moyeu convertible avec end caps QR"
+      "system": "SRAM hydraulique HRD",
+      "fluid": "DOT",
+      "compatibleWith": [
+        "SRAM HRD DOT"
+      ],
+      "warnings": [
+        "Ne jamais mélanger DOT et huile minérale"
+      ]
     },
     {
-      "frame": "12x100 / 12x142",
-      "wheel": "QR 100/135",
-      "result": "non compatible sauf moyeu convertible TA"
-    },
-    {
-      "frame": "12x100 / 12x142",
-      "wheel": "12x100 / 12x142",
-      "result": "compatible direct"
-    },
-    {
-      "frame": "15x100 / 12x142",
-      "wheel": "12x100 / 12x142",
-      "result": "fourche non compatible si roue avant 12x100 sans end caps 15x100"
-    },
-    {
-      "frame": "Boost 15x110 / 12x148",
-      "wheel": "15x100 / 12x142",
-      "result": "non compatible direct : standard non-Boost"
-    }
-  ],
-  "headsets": [
-    {
-      "shis": "EC34/28.6 | EC34/30",
-      "notes": "Jeu externe 1 1/8 classique, pivot droit"
-    },
-    {
-      "shis": "ZS44/28.6 | EC44/40",
-      "notes": "Tapered courant gravel/route moderne"
-    },
-    {
-      "shis": "IS42/28.6 | IS52/40",
-      "notes": "Intégré tapered, vérifier angles roulements"
+      "system": "Mécanique route",
+      "fluid": "none",
+      "compatibleWith": [
+        "Étriers route tirage court type TRP Spyre Road"
+      ],
+      "warnings": [
+        "Vérifier tirage court/long pull"
+      ]
     }
   ]
 }

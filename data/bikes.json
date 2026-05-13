@@ -1,38 +1,22 @@
 {
-  "version": "0.1",
   "models": [
     {
       "brand": "Genesis",
       "model": "Croix de Fer 20",
       "year": "2024",
-      "category": "gravel acier",
-      "drivetrain": "Shimano GRX 400 2x10",
-      "brakes": "freins à disque mécaniques selon montage / vérifier fiche exacte",
-      "wheelAxles": "QR 100/135 selon versions Croix de Fer",
-      "bottomBracket": "BSA fileté",
-      "headset": "tapered selon cadre, vérifier SHIS",
-      "seatpost": "27.2 mm souvent, à confirmer",
-      "tireClearance": "env. 45 mm selon version/montage",
-      "notes": [
-        "Vérifier année exacte et fiche constructeur avant commande de pièces.",
-        "Pour roues DT Swiss 350, prévoir end caps QR si cadre QR."
-      ]
+      "bb": "BSA 68",
+      "headset": "SHIS à vérifier selon taille/fourche",
+      "axles": "QR selon montage origine / vérifier moyeux",
+      "notes": "Fiche exemple à compléter par données constructeur."
     },
     {
       "brand": "Cannondale",
       "model": "Trail",
-      "year": "2023-2025",
-      "category": "VTT semi-rigide",
-      "drivetrain": "variable selon version",
-      "brakes": "disque hydraulique ou mécanique selon version",
-      "wheelAxles": "souvent QR arrière sur entrées de gamme, vérifier taille/année",
-      "bottomBracket": "BSA fileté selon versions",
-      "headset": "semi-intégré, vérifier référence cadre",
-      "seatpost": "31.6 mm fréquent",
-      "tireClearance": "VTT 29/27.5 selon taille",
-      "notes": [
-        "Cannondale utilise des pattes spécifiques selon millésime, toujours comparer visuellement."
-      ]
+      "year": "2020-2025",
+      "bb": "BSA/PF selon millésime",
+      "headset": "Semi-intégré selon millésime",
+      "axles": "QR ou Boost selon version",
+      "notes": "Vérifier modèle exact."
     }
   ]
 }

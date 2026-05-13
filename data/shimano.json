@@ -1,265 +1,1070 @@
 {
-  "brand": "Shimano",
-  "version": "0.1",
-  "derailleurs": [
-    {
-      "ref": "RD-R7000-GS",
-      "name": "105 R7000 GS",
-      "family": "105",
-      "category": "route",
-      "speeds": 11,
-      "maxSprocket": 34,
-      "minSprocket": 11,
-      "capacity": 39,
-      "cablePull": "shimano_road_11",
-      "chainType": "HG-11"
-    },
-    {
-      "ref": "RD-R7000-SS",
-      "name": "105 R7000 SS",
-      "family": "105",
-      "category": "route",
-      "speeds": 11,
-      "maxSprocket": 30,
-      "minSprocket": 11,
-      "capacity": 35,
-      "cablePull": "shimano_road_11",
-      "chainType": "HG-11"
-    },
-    {
-      "ref": "RD-R8000-GS",
-      "name": "Ultegra R8000 GS",
-      "family": "Ultegra",
-      "category": "route",
-      "speeds": 11,
-      "maxSprocket": 34,
-      "minSprocket": 11,
-      "capacity": 39,
-      "cablePull": "shimano_road_11",
-      "chainType": "HG-11"
-    },
-    {
-      "ref": "RD-RX400",
-      "name": "GRX RX400 10v",
-      "family": "GRX",
-      "category": "gravel",
-      "speeds": 10,
-      "maxSprocket": 36,
-      "minSprocket": 11,
-      "capacity": 41,
-      "cablePull": "shimano_tiagra_4700_grx400",
-      "chainType": "HG-X 10"
-    },
-    {
-      "ref": "RD-RX810",
-      "name": "GRX RX810 11v",
-      "family": "GRX",
-      "category": "gravel",
-      "speeds": 11,
-      "maxSprocket": 34,
-      "minSprocket": 11,
-      "capacity": 40,
-      "cablePull": "shimano_road_11",
-      "chainType": "HG-11"
-    },
-    {
-      "ref": "RD-RX812",
-      "name": "GRX RX812 11v 1x",
-      "family": "GRX",
-      "category": "gravel",
-      "speeds": 11,
-      "maxSprocket": 42,
-      "minSprocket": 11,
-      "capacity": 31,
-      "cablePull": "shimano_road_11",
-      "chainType": "HG-11"
-    },
-    {
-      "ref": "RD-M591",
-      "name": "Deore M591 9v SGS",
-      "family": "Deore",
-      "category": "mtb",
-      "speeds": 9,
-      "maxSprocket": 34,
-      "minSprocket": 11,
-      "capacity": 45,
-      "cablePull": "shimano_mtb_9",
-      "chainType": "HG 9"
-    },
-    {
-      "ref": "RD-M3100-SGS",
-      "name": "Alivio M3100 9v SGS",
-      "family": "Alivio",
-      "category": "mtb",
-      "speeds": 9,
-      "maxSprocket": 36,
-      "minSprocket": 11,
-      "capacity": 45,
-      "cablePull": "shimano_mtb_9",
-      "chainType": "HG 9"
-    },
-    {
-      "ref": "RD-M310",
-      "name": "Altus M310 7/8v",
-      "family": "Altus",
-      "category": "mtb",
-      "speeds": 8,
-      "maxSprocket": 34,
-      "minSprocket": 11,
-      "capacity": 43,
-      "cablePull": "shimano_mtb_7_8",
-      "chainType": "HG 6/7/8"
-    }
-  ],
+  "meta": {
+    "version": "9.3",
+    "source": "Structured MVP inspired by Shimano Product Info compatibility tables; verify official docs for final workshop decision."
+  },
   "shifters": [
     {
+      "ref": "ST-4700",
+      "brand": "Shimano",
+      "series": "Tiagra 4700",
+      "speeds": 10,
+      "pull": "shimano_road_10_4700",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "SL-4700",
+      "brand": "Shimano",
+      "series": "Tiagra 4700 flat/bar-end",
+      "speeds": 10,
+      "pull": "shimano_road_10_4700",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
       "ref": "ST-R7000",
-      "name": "105 R7000 STI",
-      "category": "route",
+      "brand": "Shimano",
+      "series": "105 R7000",
       "speeds": 11,
-      "cablePull": "shimano_road_11",
-      "brakeType": "road"
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R7020",
+      "brand": "Shimano",
+      "series": "105 R7000 hydraulic",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R7025",
+      "brand": "Shimano",
+      "series": "105 R7000 small hand",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
     },
     {
       "ref": "ST-R8000",
-      "name": "Ultegra R8000 STI",
-      "category": "route",
+      "brand": "Shimano",
+      "series": "Ultegra R8000",
       "speeds": 11,
-      "cablePull": "shimano_road_11",
-      "brakeType": "road"
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R8020",
+      "brand": "Shimano",
+      "series": "Ultegra R8000 hydraulic",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R8025",
+      "brand": "Shimano",
+      "series": "Ultegra R8000 small hand",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R9100",
+      "brand": "Shimano",
+      "series": "Dura-Ace R9100",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R9120",
+      "brand": "Shimano",
+      "series": "Dura-Ace R9100 hydraulic",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
     },
     {
       "ref": "ST-RX400",
-      "name": "GRX RX400 STI",
-      "category": "gravel",
+      "brand": "Shimano",
+      "series": "GRX RX400",
       "speeds": 10,
-      "cablePull": "shimano_tiagra_4700_grx400",
-      "brakeType": "road"
+      "pull": "shimano_road_10_4700",
+      "system": "mechanical",
+      "discipline": "road/gravel"
     },
     {
       "ref": "ST-RX600",
-      "name": "GRX RX600 STI",
-      "category": "gravel",
+      "brand": "Shimano",
+      "series": "GRX RX600 11v",
       "speeds": 11,
-      "cablePull": "shimano_road_11",
-      "brakeType": "road"
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
     },
     {
-      "ref": "ST-M510",
-      "name": "Deore ST-M510",
-      "category": "mtb",
+      "ref": "ST-RX810",
+      "brand": "Shimano",
+      "series": "GRX RX810 11v",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-RX610",
+      "brand": "Shimano",
+      "series": "GRX RX610 12v mechanical",
+      "speeds": 12,
+      "pull": "shimano_road_12_mech",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-RX820",
+      "brand": "Shimano",
+      "series": "GRX RX820 12v mechanical",
+      "speeds": 12,
+      "pull": "shimano_road_12_mech",
+      "system": "mechanical",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R7170",
+      "brand": "Shimano",
+      "series": "105 R7100 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R8170",
+      "brand": "Shimano",
+      "series": "Ultegra R8100 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-R9270",
+      "brand": "Shimano",
+      "series": "Dura-Ace R9200 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "ST-RX825",
+      "brand": "Shimano",
+      "series": "GRX RX825 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "discipline": "road/gravel"
+    },
+    {
+      "ref": "SL-M4100-R",
+      "brand": "Shimano",
+      "series": "Deore M4100",
+      "speeds": 10,
+      "pull": "shimano_mtb_10",
+      "system": "mechanical",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "SL-M5100-R",
+      "brand": "Shimano",
+      "series": "Deore M5100",
+      "speeds": 11,
+      "pull": "shimano_mtb_11",
+      "system": "mechanical",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "SL-M6100-R",
+      "brand": "Shimano",
+      "series": "Deore M6100",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "SL-M7100-R",
+      "brand": "Shimano",
+      "series": "SLX M7100",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "SL-M8100-R",
+      "brand": "Shimano",
+      "series": "XT M8100",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "SL-M9100-R",
+      "brand": "Shimano",
+      "series": "XTR M9100",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "SL-U4000-9R",
+      "brand": "Shimano",
+      "series": "CUES U4000 9v",
       "speeds": 9,
-      "cablePull": "shimano_mtb_9",
-      "brakeType": "vbrake"
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "discipline": "trekking"
     },
     {
-      "ref": "SL-M315",
-      "name": "Altus SL-M315",
-      "category": "mtb",
-      "speeds": 8,
-      "cablePull": "shimano_mtb_7_8",
-      "brakeType": "flatbar"
+      "ref": "SL-U4010-9R",
+      "brand": "Shimano",
+      "series": "CUES U4010 9v",
+      "speeds": 9,
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "discipline": "trekking"
+    },
+    {
+      "ref": "SL-U6000-10R",
+      "brand": "Shimano",
+      "series": "CUES U6000 10v",
+      "speeds": 10,
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "discipline": "trekking"
+    },
+    {
+      "ref": "SL-U6000-11R",
+      "brand": "Shimano",
+      "series": "CUES U6000 11v",
+      "speeds": 11,
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "discipline": "trekking"
     }
   ],
-  "chains": [
+  "rearDerailleurs": [
     {
-      "ref": "CN-HG601",
-      "name": "Shimano HG601 11v",
-      "speeds": 11,
-      "type": "HG-11"
-    },
-    {
-      "ref": "CN-HG701",
-      "name": "Shimano HG701 11v",
-      "speeds": 11,
-      "type": "HG-11"
-    },
-    {
-      "ref": "CN-HG54",
-      "name": "Shimano HG54 10v",
+      "ref": "RD-4700-SS",
+      "brand": "Shimano",
+      "series": "Tiagra 4700 SS",
       "speeds": 10,
-      "type": "HG-X 10"
+      "pull": "shimano_road_10_4700",
+      "system": "mechanical",
+      "maxSprocket": 28,
+      "minSprocket": 11,
+      "capacity": 33,
+      "cage": "SS",
+      "discipline": "road"
     },
     {
-      "ref": "CN-HG53",
-      "name": "Shimano HG53 9v",
+      "ref": "RD-4700-GS",
+      "brand": "Shimano",
+      "series": "Tiagra 4700 GS",
+      "speeds": 10,
+      "pull": "shimano_road_10_4700",
+      "system": "mechanical",
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 41,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-RX400",
+      "brand": "Shimano",
+      "series": "GRX RX400",
+      "speeds": 10,
+      "pull": "shimano_road_10_4700",
+      "system": "mechanical",
+      "maxSprocket": 36,
+      "minSprocket": 11,
+      "capacity": 41,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-R7000-SS",
+      "brand": "Shimano",
+      "series": "105 R7000 SS",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 30,
+      "minSprocket": 11,
+      "capacity": 35,
+      "cage": "SS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-R7000-GS",
+      "brand": "Shimano",
+      "series": "105 R7000 GS",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 39,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-R8000-SS",
+      "brand": "Shimano",
+      "series": "Ultegra R8000 SS",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 30,
+      "minSprocket": 11,
+      "capacity": 35,
+      "cage": "SS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-R8000-GS",
+      "brand": "Shimano",
+      "series": "Ultegra R8000 GS",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 39,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-R9100-SS",
+      "brand": "Shimano",
+      "series": "Dura-Ace R9100 SS",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 30,
+      "minSprocket": 11,
+      "capacity": 35,
+      "cage": "SS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-RX800-GS",
+      "brand": "Shimano",
+      "series": "GRX RX800 GS",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 40,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-RX810",
+      "brand": "Shimano",
+      "series": "GRX RX810 2x11",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 40,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-RX812",
+      "brand": "Shimano",
+      "series": "GRX RX812 1x11",
+      "speeds": 11,
+      "pull": "shimano_road_11",
+      "system": "mechanical",
+      "maxSprocket": 42,
+      "minSprocket": 11,
+      "capacity": 31,
+      "cage": "1x",
+      "discipline": "road",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-R7150",
+      "brand": "Shimano",
+      "series": "105 R7100 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "maxSprocket": 36,
+      "minSprocket": 11,
+      "capacity": 41,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-R8150",
+      "brand": "Shimano",
+      "series": "Ultegra R8100 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 39,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-R9250",
+      "brand": "Shimano",
+      "series": "Dura-Ace R9200 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "maxSprocket": 34,
+      "minSprocket": 11,
+      "capacity": 39,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-RX825",
+      "brand": "Shimano",
+      "series": "GRX RX825 Di2",
+      "speeds": 12,
+      "pull": "shimano_road_12_di2",
+      "system": "di2",
+      "maxSprocket": 36,
+      "minSprocket": 11,
+      "capacity": 41,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-RX820",
+      "brand": "Shimano",
+      "series": "GRX RX820 2x12 mechanical",
+      "speeds": 12,
+      "pull": "shimano_road_12_mech",
+      "system": "mechanical",
+      "maxSprocket": 36,
+      "minSprocket": 11,
+      "capacity": 42,
+      "cage": "GS",
+      "discipline": "road"
+    },
+    {
+      "ref": "RD-RX822-GS",
+      "brand": "Shimano",
+      "series": "GRX RX822 1x12 10-45",
+      "speeds": 12,
+      "pull": "shimano_road_12_mech",
+      "system": "mechanical",
+      "maxSprocket": 45,
+      "minSprocket": 10,
+      "capacity": 35,
+      "cage": "GS",
+      "discipline": "road",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-RX822-SGS",
+      "brand": "Shimano",
+      "series": "GRX RX822 1x12 10-51",
+      "speeds": 12,
+      "pull": "shimano_road_12_mech",
+      "system": "mechanical",
+      "maxSprocket": 51,
+      "minSprocket": 10,
+      "capacity": 41,
+      "cage": "SGS",
+      "discipline": "road",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-M4100-SGS",
+      "brand": "Shimano",
+      "series": "Deore M4100 10v",
+      "speeds": 10,
+      "pull": "shimano_mtb_10",
+      "system": "mechanical",
+      "maxSprocket": 46,
+      "minSprocket": 11,
+      "capacity": 41,
+      "cage": "SGS",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "RD-M5100-SGS",
+      "brand": "Shimano",
+      "series": "Deore M5100 11v",
+      "speeds": 11,
+      "pull": "shimano_mtb_11",
+      "system": "mechanical",
+      "maxSprocket": 51,
+      "minSprocket": 11,
+      "capacity": 40,
+      "cage": "SGS",
+      "discipline": "mtb",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-M5120-SGS",
+      "brand": "Shimano",
+      "series": "Deore M5120 10/11v",
+      "speeds": [
+        10,
+        11
+      ],
+      "pull": "shimano_mtb_11",
+      "system": "mechanical",
+      "maxSprocket": 46,
+      "minSprocket": 11,
+      "capacity": 41,
+      "cage": "SGS",
+      "discipline": "mtb"
+    },
+    {
+      "ref": "RD-M6100-SGS",
+      "brand": "Shimano",
+      "series": "Deore M6100 12v",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "maxSprocket": 51,
+      "minSprocket": 10,
+      "capacity": 41,
+      "cage": "SGS",
+      "discipline": "mtb",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-M7100-SGS",
+      "brand": "Shimano",
+      "series": "SLX M7100 12v",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "maxSprocket": 51,
+      "minSprocket": 10,
+      "capacity": 41,
+      "cage": "SGS",
+      "discipline": "mtb",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-M8100-SGS",
+      "brand": "Shimano",
+      "series": "XT M8100 12v",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "maxSprocket": 51,
+      "minSprocket": 10,
+      "capacity": 41,
+      "cage": "SGS",
+      "discipline": "mtb",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-M9100-SGS",
+      "brand": "Shimano",
+      "series": "XTR M9100 12v",
+      "speeds": 12,
+      "pull": "shimano_mtb_12",
+      "system": "mechanical",
+      "maxSprocket": 51,
+      "minSprocket": 10,
+      "capacity": 41,
+      "cage": "SGS",
+      "discipline": "mtb",
+      "oneByOnly": true
+    },
+    {
+      "ref": "RD-U4000",
+      "brand": "Shimano",
+      "series": "CUES U4000 9v 1x",
       "speeds": 9,
-      "type": "HG 9"
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "maxSprocket": 46,
+      "minSprocket": 11,
+      "capacity": 35,
+      "cage": "SGS",
+      "discipline": "trekking",
+      "oneByOnly": true
     },
     {
-      "ref": "CN-HG40",
-      "name": "Shimano HG40 6/7/8v",
-      "speeds": 8,
-      "type": "HG 6/7/8"
+      "ref": "RD-U4020",
+      "brand": "Shimano",
+      "series": "CUES U4000 9v 2x",
+      "speeds": 9,
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "maxSprocket": 36,
+      "minSprocket": 11,
+      "capacity": 45,
+      "cage": "GS",
+      "discipline": "trekking"
+    },
+    {
+      "ref": "RD-U6000",
+      "brand": "Shimano",
+      "series": "CUES U6000 10/11v",
+      "speeds": [
+        10,
+        11
+      ],
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "maxSprocket": 50,
+      "minSprocket": 11,
+      "capacity": 39,
+      "cage": "SGS",
+      "discipline": "trekking"
+    },
+    {
+      "ref": "RD-M5130",
+      "brand": "Shimano",
+      "series": "Deore LinkGlide 10/11v",
+      "speeds": [
+        10,
+        11
+      ],
+      "pull": "shimano_cues_lg",
+      "system": "mechanical",
+      "maxSprocket": 43,
+      "minSprocket": 11,
+      "capacity": 35,
+      "cage": "SGS",
+      "discipline": "mtb",
+      "oneByOnly": true
     }
   ],
   "cassettes": [
     {
-      "ref": "CS-HG700 11-34",
-      "name": "105 HG700 11-34",
-      "speeds": 11,
-      "range": "11-34",
-      "largest": 34,
-      "smallest": 11,
+      "ref": "CS-HG500 11-28",
+      "brand": "Shimano",
+      "speeds": 10,
+      "range": [
+        11,
+        28
+      ],
       "freehub": "HG",
-      "chainType": "HG-11"
+      "family": "HG 10v"
     },
     {
-      "ref": "CS-R7000 11-32",
-      "name": "105 R7000 11-32",
-      "speeds": 11,
-      "range": "11-32",
-      "largest": 32,
-      "smallest": 11,
+      "ref": "CS-HG500 11-32",
+      "brand": "Shimano",
+      "speeds": 10,
+      "range": [
+        11,
+        32
+      ],
       "freehub": "HG",
-      "chainType": "HG-11"
+      "family": "HG 10v"
     },
     {
       "ref": "CS-HG500 11-34",
-      "name": "HG500 10v 11-34",
+      "brand": "Shimano",
       "speeds": 10,
-      "range": "11-34",
-      "largest": 34,
-      "smallest": 11,
+      "range": [
+        11,
+        34
+      ],
       "freehub": "HG",
-      "chainType": "HG-X 10"
+      "family": "HG 10v"
     },
     {
-      "ref": "CS-HG400 11-36",
-      "name": "HG400 9v 11-36",
-      "speeds": 9,
-      "range": "11-36",
-      "largest": 36,
-      "smallest": 11,
+      "ref": "CS-HG81 11-36",
+      "brand": "Shimano",
+      "speeds": 10,
+      "range": [
+        11,
+        36
+      ],
       "freehub": "HG",
-      "chainType": "HG 9"
+      "family": "HG-X 10v"
+    },
+    {
+      "ref": "CS-R7000 11-28",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        28
+      ],
+      "freehub": "HG Road",
+      "family": "HG 11v road"
+    },
+    {
+      "ref": "CS-R7000 11-30",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        30
+      ],
+      "freehub": "HG Road",
+      "family": "HG 11v road"
+    },
+    {
+      "ref": "CS-R7000 11-32",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        32
+      ],
+      "freehub": "HG Road",
+      "family": "HG 11v road"
+    },
+    {
+      "ref": "CS-HG700 11-34",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        34
+      ],
+      "freehub": "HG",
+      "family": "HG 11v road/gravel"
+    },
+    {
+      "ref": "CS-HG800 11-34",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        34
+      ],
+      "freehub": "HG",
+      "family": "HG 11v road/gravel"
+    },
+    {
+      "ref": "CS-M7000 11-40",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        40
+      ],
+      "freehub": "HG",
+      "family": "HG-X 11v MTB"
+    },
+    {
+      "ref": "CS-M8000 11-42",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        42
+      ],
+      "freehub": "HG",
+      "family": "HG-X 11v MTB"
+    },
+    {
+      "ref": "CS-M5100 11-51",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        51
+      ],
+      "freehub": "HG",
+      "family": "HG-X 11v MTB"
+    },
+    {
+      "ref": "CS-R7100 11-34",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        11,
+        34
+      ],
+      "freehub": "HG Road",
+      "family": "HG 12v road"
+    },
+    {
+      "ref": "CS-R8100 11-30",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        11,
+        30
+      ],
+      "freehub": "HG Road",
+      "family": "HG 12v road"
+    },
+    {
+      "ref": "CS-R8100 11-34",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        11,
+        34
+      ],
+      "freehub": "HG Road",
+      "family": "HG 12v road"
+    },
+    {
+      "ref": "CS-HG710 11-36",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        11,
+        36
+      ],
+      "freehub": "HG Road",
+      "family": "HG 12v gravel"
+    },
+    {
+      "ref": "CS-M6100 10-51",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        10,
+        51
+      ],
+      "freehub": "MicroSpline",
+      "family": "HyperGlide+ 12v MTB"
+    },
+    {
+      "ref": "CS-M7100 10-45",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        10,
+        45
+      ],
+      "freehub": "MicroSpline",
+      "family": "HyperGlide+ 12v MTB"
+    },
+    {
+      "ref": "CS-M7100 10-51",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        10,
+        51
+      ],
+      "freehub": "MicroSpline",
+      "family": "HyperGlide+ 12v MTB"
+    },
+    {
+      "ref": "CS-M8100 10-45",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        10,
+        45
+      ],
+      "freehub": "MicroSpline",
+      "family": "HyperGlide+ 12v MTB"
+    },
+    {
+      "ref": "CS-M8100 10-51",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        10,
+        51
+      ],
+      "freehub": "MicroSpline",
+      "family": "HyperGlide+ 12v MTB"
+    },
+    {
+      "ref": "CS-M9101 10-45",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        10,
+        45
+      ],
+      "freehub": "MicroSpline",
+      "family": "HyperGlide+ 12v MTB"
+    },
+    {
+      "ref": "CS-M9101 10-51",
+      "brand": "Shimano",
+      "speeds": 12,
+      "range": [
+        10,
+        51
+      ],
+      "freehub": "MicroSpline",
+      "family": "HyperGlide+ 12v MTB"
+    },
+    {
+      "ref": "CS-LG300-9 11-36",
+      "brand": "Shimano",
+      "speeds": 9,
+      "range": [
+        11,
+        36
+      ],
+      "freehub": "HG",
+      "family": "LinkGlide CUES 9v",
+      "linkglide": true
+    },
+    {
+      "ref": "CS-LG300-9 11-46",
+      "brand": "Shimano",
+      "speeds": 9,
+      "range": [
+        11,
+        46
+      ],
+      "freehub": "HG",
+      "family": "LinkGlide CUES 9v",
+      "linkglide": true
+    },
+    {
+      "ref": "CS-LG400-10 11-39",
+      "brand": "Shimano",
+      "speeds": 10,
+      "range": [
+        11,
+        39
+      ],
+      "freehub": "HG",
+      "family": "LinkGlide CUES 10v",
+      "linkglide": true
+    },
+    {
+      "ref": "CS-LG400-10 11-43",
+      "brand": "Shimano",
+      "speeds": 10,
+      "range": [
+        11,
+        43
+      ],
+      "freehub": "HG",
+      "family": "LinkGlide CUES 10v",
+      "linkglide": true
+    },
+    {
+      "ref": "CS-LG400-10 11-48",
+      "brand": "Shimano",
+      "speeds": 10,
+      "range": [
+        11,
+        48
+      ],
+      "freehub": "HG",
+      "family": "LinkGlide CUES 10v",
+      "linkglide": true
+    },
+    {
+      "ref": "CS-LG700-11 11-50",
+      "brand": "Shimano",
+      "speeds": 11,
+      "range": [
+        11,
+        50
+      ],
+      "freehub": "HG",
+      "family": "LinkGlide CUES 11v",
+      "linkglide": true
     }
   ],
-  "freehubRules": [
+  "chains": [
     {
-      "freehub": "HG",
-      "compatibleWith": [
-        "Shimano HG 8/9/10/11 route-gravel",
-        "SRAM PG 8/9/10/11"
-      ]
+      "ref": "CN-HG54",
+      "brand": "Shimano",
+      "speeds": 10,
+      "family": "HG-X 10v",
+      "linkglide": false
     },
     {
-      "freehub": "Microspline",
-      "compatibleWith": [
-        "Shimano MTB 12v 10T"
-      ]
+      "ref": "CN-4601",
+      "brand": "Shimano",
+      "speeds": 10,
+      "family": "Road 10v",
+      "linkglide": false
     },
     {
-      "freehub": "XD",
-      "compatibleWith": [
-        "SRAM Eagle / 10T MTB"
-      ]
+      "ref": "CN-HG601",
+      "brand": "Shimano",
+      "speeds": 11,
+      "family": "HG-X11",
+      "linkglide": false
     },
     {
-      "freehub": "XDR",
-      "compatibleWith": [
-        "SRAM AXS route/gravel 12v"
-      ]
+      "ref": "CN-HG701",
+      "brand": "Shimano",
+      "speeds": 11,
+      "family": "HG-X11",
+      "linkglide": false
+    },
+    {
+      "ref": "CN-HG901",
+      "brand": "Shimano",
+      "speeds": 11,
+      "family": "HG-X11",
+      "linkglide": false
+    },
+    {
+      "ref": "CN-M6100",
+      "brand": "Shimano",
+      "speeds": 12,
+      "family": "HyperGlide+ 12v",
+      "linkglide": false
+    },
+    {
+      "ref": "CN-M7100",
+      "brand": "Shimano",
+      "speeds": 12,
+      "family": "HyperGlide+ 12v",
+      "linkglide": false
+    },
+    {
+      "ref": "CN-M8100",
+      "brand": "Shimano",
+      "speeds": 12,
+      "family": "HyperGlide+ 12v",
+      "linkglide": false
+    },
+    {
+      "ref": "CN-M9100",
+      "brand": "Shimano",
+      "speeds": 12,
+      "family": "HyperGlide+ 12v",
+      "linkglide": false
+    },
+    {
+      "ref": "CN-LG500",
+      "brand": "Shimano",
+      "speeds": [
+        9,
+        10,
+        11
+      ],
+      "family": "LinkGlide/CUES",
+      "linkglide": true
     }
   ]
 }
