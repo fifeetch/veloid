@@ -1,0 +1,112 @@
+{
+  "freehubs": [
+    {
+      "name": "HG",
+      "accepts": [
+        "Shimano HG 8-12 route",
+        "SRAM PG 11/12 départ 11 dents"
+      ],
+      "warnings": [
+        "Pas de cassettes départ 10 dents XD/XDR/MicroSpline"
+      ]
+    },
+    {
+      "name": "MicroSpline",
+      "accepts": [
+        "Shimano MTB 12v 10-45/10-51"
+      ],
+      "warnings": [
+        "Nécessaire pour Shimano MTB 12v 10 dents"
+      ]
+    },
+    {
+      "name": "XD",
+      "accepts": [
+        "SRAM Eagle / XD départ 10 dents"
+      ],
+      "warnings": [
+        "XDR accepte XD avec entretoise 1,85 mm selon SRAM"
+      ]
+    },
+    {
+      "name": "XDR",
+      "accepts": [
+        "SRAM Road/XPLR AXS 10 dents",
+        "XD avec entretoise 1,85 mm"
+      ],
+      "warnings": [
+        "Interface route 1,85 mm plus longue que XD"
+      ]
+    }
+  ],
+  "bottomBrackets": [
+    {
+      "frame": "BSA 68/73",
+      "cranks": [
+        "Shimano 24 mm",
+        "SRAM DUB BSA",
+        "SRAM GXP BSA",
+        "Carré JIS"
+      ],
+      "note": "Standard fileté très courant atelier."
+    },
+    {
+      "frame": "BB86/BB92",
+      "cranks": [
+        "Shimano 24 mm pressfit",
+        "SRAM DUB pressfit"
+      ],
+      "note": "Vérifier largeur et entretoises."
+    },
+    {
+      "frame": "PF30/BB30",
+      "cranks": [
+        "30 mm",
+        "DUB via boîtier adapté",
+        "24 mm via adaptateur"
+      ],
+      "note": "Attention aux adaptateurs/craquements."
+    },
+    {
+      "frame": "T47",
+      "cranks": [
+        "24 mm",
+        "DUB",
+        "30 mm selon cuvettes"
+      ],
+      "note": "Fileté grand diamètre moderne."
+    }
+  ],
+  "brakes": [
+    {
+      "system": "Shimano hydraulique route/gravel",
+      "fluid": "mineral",
+      "compatibleWith": [
+        "Shimano étrier route/gravel minéral"
+      ],
+      "warnings": [
+        "Ne jamais mélanger DOT et huile minérale"
+      ]
+    },
+    {
+      "system": "SRAM hydraulique HRD",
+      "fluid": "DOT",
+      "compatibleWith": [
+        "SRAM HRD DOT"
+      ],
+      "warnings": [
+        "Ne jamais mélanger DOT et huile minérale"
+      ]
+    },
+    {
+      "system": "Mécanique route",
+      "fluid": "none",
+      "compatibleWith": [
+        "Étriers route tirage court type TRP Spyre Road"
+      ],
+      "warnings": [
+        "Vérifier tirage court/long pull"
+      ]
+    }
+  ]
+}

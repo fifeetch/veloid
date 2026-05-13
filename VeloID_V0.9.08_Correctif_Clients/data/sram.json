@@ -1,0 +1,776 @@
+{
+  "meta": {
+    "version": "9.3",
+    "source": "Structured MVP inspired by SRAM compatibility maps; verify official docs for final workshop decision."
+  },
+  "shifters": [
+    {
+      "ref": "SB-APX-A1",
+      "series": "Apex 1 mechanical",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "SB-RIV-B1",
+      "series": "Rival 22 mechanical",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "SB-FRC-B1",
+      "series": "Force 22 mechanical",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "SB-RED-C2",
+      "series": "Red 22 mechanical",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "ED-APX-D1",
+      "series": "Apex AXS D1",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "ED-RIV-D1",
+      "series": "Rival AXS D1",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "ED-FRC-D1",
+      "series": "Force eTap AXS D1",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "ED-FRC-E1",
+      "series": "Force AXS E1",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "ED-RED-D1",
+      "series": "RED eTap AXS D1",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "ED-RED-E1",
+      "series": "RED AXS E1",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "EC-AXS-POD",
+      "series": "AXS Pod Controller",
+      "speeds": 12,
+      "pull": "sram_axs_mtb",
+      "system": "axs",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "EC-AXS-BLIP",
+      "series": "AXS Blip / Wireless Blip",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "brand": "SRAM"
+    }
+  ],
+  "rearDerailleurs": [
+    {
+      "ref": "RD-APX-1-A1",
+      "series": "Apex 1 mechanical",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "maxSprocket": 42,
+      "minSprocket": 10,
+      "capacity": 32,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-RIV-B1",
+      "series": "Rival 22 WiFLi",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "maxSprocket": 32,
+      "minSprocket": 11,
+      "capacity": 37,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-FRC-B1",
+      "series": "Force 22 WiFLi",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "maxSprocket": 32,
+      "minSprocket": 11,
+      "capacity": 37,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-RED-C2",
+      "series": "RED 22 WiFLi",
+      "speeds": 11,
+      "pull": "sram_exact_11_road",
+      "system": "mechanical",
+      "maxSprocket": 32,
+      "minSprocket": 11,
+      "capacity": 37,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-APX-E-D1",
+      "series": "Apex AXS XPLR",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 44,
+      "minSprocket": 10,
+      "capacity": 36,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-RIV1-E-D1",
+      "series": "Rival AXS XPLR",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 44,
+      "minSprocket": 10,
+      "capacity": 36,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-FRC-E-D1",
+      "series": "Force AXS XPLR",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 44,
+      "minSprocket": 10,
+      "capacity": 36,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-RED-E-D1",
+      "series": "RED AXS XPLR",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 44,
+      "minSprocket": 10,
+      "capacity": 36,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-RIV-E-D1",
+      "series": "Rival AXS 2x",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 36,
+      "minSprocket": 10,
+      "capacity": 39,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-FRC-D1",
+      "series": "Force eTap AXS 2x",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 36,
+      "minSprocket": 10,
+      "capacity": 39,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-RED-D1",
+      "series": "RED eTap AXS 2x",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 33,
+      "minSprocket": 10,
+      "capacity": 36,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-RED-E1",
+      "series": "RED AXS E1 2x",
+      "speeds": 12,
+      "pull": "sram_axs_road",
+      "system": "axs",
+      "maxSprocket": 36,
+      "minSprocket": 10,
+      "capacity": 39,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-NX-1-B1",
+      "series": "NX Eagle",
+      "speeds": 12,
+      "pull": "sram_xactuation_eagle",
+      "system": "mechanical",
+      "maxSprocket": 50,
+      "minSprocket": 11,
+      "capacity": 40,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-GX-1-B2",
+      "series": "GX Eagle",
+      "speeds": 12,
+      "pull": "sram_xactuation_eagle",
+      "system": "mechanical",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-X01-1-B2",
+      "series": "X01 Eagle",
+      "speeds": 12,
+      "pull": "sram_xactuation_eagle",
+      "system": "mechanical",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-XX1-1-B2",
+      "series": "XX1 Eagle",
+      "speeds": 12,
+      "pull": "sram_xactuation_eagle",
+      "system": "mechanical",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-GX-1E-A1",
+      "series": "GX Eagle AXS",
+      "speeds": 12,
+      "pull": "sram_axs_mtb",
+      "system": "axs",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-X0-1E-A1",
+      "series": "X0 Eagle AXS",
+      "speeds": 12,
+      "pull": "sram_axs_mtb",
+      "system": "axs",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-XX1-1E-A1",
+      "series": "XX1 Eagle AXS",
+      "speeds": 12,
+      "pull": "sram_axs_mtb",
+      "system": "axs",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-GX-E-B1",
+      "series": "GX Eagle Transmission T-Type",
+      "speeds": 12,
+      "pull": "sram_ttype",
+      "system": "axs",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "tType": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-X0-E-B1",
+      "series": "X0 Eagle Transmission T-Type",
+      "speeds": 12,
+      "pull": "sram_ttype",
+      "system": "axs",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "tType": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "RD-XX-E-B1",
+      "series": "XX Eagle Transmission T-Type",
+      "speeds": 12,
+      "pull": "sram_ttype",
+      "system": "axs",
+      "maxSprocket": 52,
+      "minSprocket": 10,
+      "capacity": 42,
+      "oneByOnly": true,
+      "tType": true,
+      "brand": "SRAM"
+    }
+  ],
+  "cassettes": [
+    {
+      "ref": "PG-1130 11-32",
+      "speeds": 11,
+      "range": [
+        11,
+        32
+      ],
+      "freehub": "HG",
+      "family": "11v road",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "PG-1130 11-36",
+      "speeds": 11,
+      "range": [
+        11,
+        36
+      ],
+      "freehub": "HG",
+      "family": "11v road",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "PG-1130 11-42",
+      "speeds": 11,
+      "range": [
+        11,
+        42
+      ],
+      "freehub": "HG",
+      "family": "1x11",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1150 10-42",
+      "speeds": 11,
+      "range": [
+        10,
+        42
+      ],
+      "freehub": "XD",
+      "family": "1x11 XD",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1250 10-30",
+      "speeds": 12,
+      "range": [
+        10,
+        30
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1250 10-36",
+      "speeds": 12,
+      "range": [
+        10,
+        36
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1270 10-28",
+      "speeds": 12,
+      "range": [
+        10,
+        28
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1270 10-33",
+      "speeds": 12,
+      "range": [
+        10,
+        33
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1270 10-36",
+      "speeds": 12,
+      "range": [
+        10,
+        36
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1290 10-28",
+      "speeds": 12,
+      "range": [
+        10,
+        28
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1290 10-33",
+      "speeds": 12,
+      "range": [
+        10,
+        33
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1290 10-36",
+      "speeds": 12,
+      "range": [
+        10,
+        36
+      ],
+      "freehub": "XDR",
+      "family": "Road AXS",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1231 11-44",
+      "speeds": 12,
+      "range": [
+        11,
+        44
+      ],
+      "freehub": "HG",
+      "family": "Apex XPLR",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1251 10-44",
+      "speeds": 12,
+      "range": [
+        10,
+        44
+      ],
+      "freehub": "XDR",
+      "family": "XPLR",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1271 10-44",
+      "speeds": 12,
+      "range": [
+        10,
+        44
+      ],
+      "freehub": "XDR",
+      "family": "XPLR",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "PG-1230 11-50",
+      "speeds": 12,
+      "range": [
+        11,
+        50
+      ],
+      "freehub": "HG",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "PG-1210 11-50",
+      "speeds": 12,
+      "range": [
+        11,
+        50
+      ],
+      "freehub": "HG",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1275 10-50",
+      "speeds": 12,
+      "range": [
+        10,
+        50
+      ],
+      "freehub": "XD",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1275 10-52",
+      "speeds": 12,
+      "range": [
+        10,
+        52
+      ],
+      "freehub": "XD",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1295 10-50",
+      "speeds": 12,
+      "range": [
+        10,
+        50
+      ],
+      "freehub": "XD",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1295 10-52",
+      "speeds": 12,
+      "range": [
+        10,
+        52
+      ],
+      "freehub": "XD",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1299 10-50",
+      "speeds": 12,
+      "range": [
+        10,
+        50
+      ],
+      "freehub": "XD",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XG-1299 10-52",
+      "speeds": 12,
+      "range": [
+        10,
+        52
+      ],
+      "freehub": "XD",
+      "family": "Eagle",
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XS-1275 10-52",
+      "speeds": 12,
+      "range": [
+        10,
+        52
+      ],
+      "freehub": "XD",
+      "family": "T-Type Eagle Transmission",
+      "tType": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XS-1295 10-52",
+      "speeds": 12,
+      "range": [
+        10,
+        52
+      ],
+      "freehub": "XD",
+      "family": "T-Type Eagle Transmission",
+      "tType": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "XS-1299 10-52",
+      "speeds": 12,
+      "range": [
+        10,
+        52
+      ],
+      "freehub": "XD",
+      "family": "T-Type Eagle Transmission",
+      "tType": true,
+      "brand": "SRAM"
+    }
+  ],
+  "chains": [
+    {
+      "ref": "PC-1130",
+      "speeds": 11,
+      "family": "11v",
+      "flattop": false,
+      "eagle": false,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "PC-1170",
+      "speeds": 11,
+      "family": "11v",
+      "flattop": false,
+      "eagle": false,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-APX-D1",
+      "speeds": 12,
+      "family": "Apex Flattop",
+      "flattop": true,
+      "eagle": false,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-RIV-D1",
+      "speeds": 12,
+      "family": "Rival Flattop",
+      "flattop": true,
+      "eagle": false,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-FRC-D1",
+      "speeds": 12,
+      "family": "Force Flattop",
+      "flattop": true,
+      "eagle": false,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-RED-D1",
+      "speeds": 12,
+      "family": "RED Flattop",
+      "flattop": true,
+      "eagle": false,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-EAGL-NX-A1",
+      "speeds": 12,
+      "family": "Eagle 12v",
+      "flattop": false,
+      "eagle": true,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-EAGL-GX-A1",
+      "speeds": 12,
+      "family": "Eagle 12v",
+      "flattop": false,
+      "eagle": true,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-EAGL-X01-A1",
+      "speeds": 12,
+      "family": "Eagle 12v",
+      "flattop": false,
+      "eagle": true,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-EAGL-XX1-A1",
+      "speeds": 12,
+      "family": "Eagle 12v",
+      "flattop": false,
+      "eagle": true,
+      "tType": false,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-TTYP-GX-A1",
+      "speeds": 12,
+      "family": "T-Type",
+      "flattop": false,
+      "eagle": true,
+      "tType": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-TTYP-X0-A1",
+      "speeds": 12,
+      "family": "T-Type",
+      "flattop": false,
+      "eagle": true,
+      "tType": true,
+      "brand": "SRAM"
+    },
+    {
+      "ref": "CN-TTYP-XX-A1",
+      "speeds": 12,
+      "family": "T-Type",
+      "flattop": false,
+      "eagle": true,
+      "tType": true,
+      "brand": "SRAM"
+    }
+  ]
+}
